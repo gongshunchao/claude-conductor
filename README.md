@@ -124,25 +124,48 @@ Execute tasks following TDD workflow.
 
 **Usage:**
 ```
-/conductor:implement [track-name]
+/conductor:implement [<track-name>] [--all]
 ```
 
 **Arguments:**
-- `track-name` - Partial name to select specific track (optional, selects next incomplete)
+- `<track-name>` - Partial name to select specific track (optional, selects next incomplete)
+- `--all` - Run all phases instead of one at a time
 
 **What it does:**
 1. Selects next incomplete track (or specified track)
-2. Delegates each task to implementer agent
-3. Follows TDD cycle: Red → Green → Refactor
-4. Creates atomic commits with git notes
-5. Triggers phase verification at phase boundaries
-6. Creates checkpoints with reviewer agent
+2. **Single-phase mode (default)**: Shows interactive phase selection, implements one phase at a time
+3. **All-phases mode (`--all`)**: Implements all remaining phases continuously
+4. Delegates each task to implementer agent
+5. Follows TDD cycle: Red → Green → Refactor
+6. Creates atomic commits with git notes
+7. Triggers phase verification at phase boundaries
+8. Creates checkpoints with reviewer agent
 
-**Example:**
+**Examples:**
 ```
 > /conductor:implement
 
-Selecting next incomplete track: 'User Authentication'
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE SELECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Track: User Authentication
+
+  [x] Phase 1: Setup                    [complete]
+  [ ] Phase 2: Backend API              [in progress - 2/5 tasks]
+  [ ] Phase 3: Frontend Integration     [pending]
+
+  Which phase would you like to implement?
+
+  A) Phase 2: Backend API (recommended)
+  B) Phase 3: Frontend Integration
+  C) All remaining phases
+```
+
+```
+> /conductor:implement --all
+
+Running all remaining phases for track 'User Authentication'.
 Current task: Implement JWT validation
 
 [RED] Writing failing test...

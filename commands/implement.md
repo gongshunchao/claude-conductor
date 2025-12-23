@@ -1,6 +1,6 @@
 ---
 description: Execute tasks from the current track following TDD workflow
-argument-hint: [track-name]
+argument-hint: [<track-name>] [--all]
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 ---
 
@@ -23,6 +23,20 @@ Execute the implementation workflow for the selected track.
    - If "not found": "No tracks found. Create one with `/conductor:newTrack`."
    - If "exists", read and parse `conductor/tracks.md`
    - If empty or malformed: "No tracks found. Create one with `/conductor:newTrack`."
+
+## Argument Parsing
+
+Parse $ARGUMENTS to determine execution mode:
+
+1. **Check for `--all` flag**: If $ARGUMENTS contains `--all`, set `run_all_phases = true`
+2. **Extract track name**: If $1 exists and doesn't start with `--`, use it as the track name
+
+Examples:
+
+- `/implement` → No track name, single-phase mode (interactive selection)
+- `/implement user-auth` → Track "user-auth", single-phase mode
+- `/implement --all` → No track name, all-phases mode
+- `/implement user-auth --all` → Track "user-auth", all-phases mode
 
 ## Track Selection
 
@@ -49,9 +63,13 @@ Before starting, check if resuming from a previous handoff:
 2. **If handoff state exists**:
 
    - Read the handoff state to get resume context
+   - Restore phase mode from state:
+     - If `run_all_phases: true` → resume in all-phases mode
+     - If `selected_phase` is set → resume in single-phase mode for that phase
    - Announce: "Resuming from handoff at phase '<phase>', task '<next_task>'"
    - Clear `.context_usage` file to reset threshold tracking
    - Delete `handoff-state.json` after reading (resume is one-time)
+   - Skip Phase Discovery and Phase Selection (already determined)
    - Skip to the `next_task` in the Task Execution Loop
 
 3. **If no handoff state**: Proceed with normal implementation flow
@@ -70,9 +88,101 @@ Read into context:
 - `conductor/tracks/<track_id>/spec.md`
 - `conductor/workflow.md`
 
+## Phase Discovery
+
+Parse phases from the track's `plan.md`:
+
+1. **Find phase headings**: Match `## Phase N: <Name>` patterns (H2 headings)
+2. **Detect completed phases**: Phases with `[checkpoint: <sha>]` suffix are complete
+3. **Count tasks per phase**: Count `- [ ]`, `- [~]`, `- [x]` lines under each phase
+4. **Determine phase status**:
+   - `complete`: Has checkpoint SHA in heading
+   - `in_progress`: Has any task marked `[~]`
+   - `pending`: All tasks marked `[ ]`
+
+Build ordered list of phases with their status and task counts.
+
+## Phase Selection
+
+### If `--all` flag is set
+
+Skip interactive selection. Announce:
+
+```
+Running all remaining phases for track '<description>'.
+```
+
+Proceed directly to Task Execution Loop with all incomplete phases.
+
+### If `--all` flag is NOT set (default: single-phase mode)
+
+#### If no incomplete phases
+
+```
+All phases complete for this track!
+
+Options:
+A) Run /conductor:status to see overall progress
+B) Run /conductor:newTrack to create a new track
+```
+
+**STOP execution.**
+
+#### If exactly one incomplete phase
+
+Auto-select the single remaining phase:
+
+```
+Only one phase remaining: Phase <N>: <name>
+Proceeding with implementation...
+```
+
+#### If multiple incomplete phases
+
+Present interactive selection:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE SELECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Track: <track description>
+
+  Available phases:
+
+  [x] Phase 1: Setup                    [complete]
+  [ ] Phase 2: Core Features            [in progress - 3/7 tasks]
+  [ ] Phase 3: Integration              [pending - 0/5 tasks]
+  [ ] Phase 4: Polish                   [pending - 0/3 tasks]
+
+───────────────────────────────────────────────────
+
+  Which phase would you like to implement?
+
+  A) Phase 2: Core Features (recommended - continue current)
+  B) Phase 3: Integration
+  C) Phase 4: Polish
+  D) All remaining phases (--all behavior)
+
+  Please select an option.
+```
+
+#### Process User Selection
+
+1. If A, B, or C: Set `selected_phase = <chosen phase number>`
+2. If D: Set `run_all_phases = true`
+3. Invalid input: Re-prompt with clarification
+
 ## Task Execution Loop
 
-For each task in plan.md (in order):
+### Determine Execution Scope
+
+Based on Phase Selection results:
+
+1. **If `run_all_phases = true`**: Execute all tasks from first incomplete phase through end
+2. **If `selected_phase` is set**: Execute only tasks within the selected phase
+
+### For each task in scope (in order):
 
 ### Delegate to Implementer Agent
 
@@ -148,6 +258,40 @@ The reviewer agent will:
 - Create checkpoint commit
 - Update plan with checkpoint SHA
 
+### After Phase Verification Completes
+
+#### If running single phase (default mode)
+
+Announce phase completion:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Phase <N>: <name> has been completed and checkpointed.
+
+  Checkpoint: <sha>
+  Tasks completed: <count>
+
+───────────────────────────────────────────────────
+
+  Next steps:
+
+  A) Continue to Phase <N+1>: <next phase name>
+  B) Take a break (run /conductor:implement later)
+  C) Check status (/conductor:status)
+
+  Would you like to continue to the next phase?
+```
+
+- **If user selects A**: Continue to next phase (set `selected_phase` to next incomplete phase)
+- **If user selects B or C**: Stop execution gracefully
+
+#### If running all phases (--all mode)
+
+Continue directly to next phase without prompting. Only stop at track completion or context threshold.
+
 ### Context Threshold Check
 
 **After each task completes**, check context usage:
@@ -203,7 +347,10 @@ Create `conductor/tracks/<track_id>/handoff-state.json`:
   "reason": "context_threshold",
   "threshold_percent": 70,
   "current_phase": "<phase name>",
+  "current_phase_number": 2,
   "phase_progress": "X/Y tasks",
+  "run_all_phases": false,
+  "selected_phase": 2,
   "last_completed_task": "<task description>",
   "last_commit_sha": "<sha>",
   "next_task": "<task description>",
@@ -213,6 +360,8 @@ Create `conductor/tracks/<track_id>/handoff-state.json`:
   ]
 }
 ```
+
+The `run_all_phases` and `selected_phase` fields preserve the phase mode across sessions.
 
 ### 5. Output Handoff Prompt
 
