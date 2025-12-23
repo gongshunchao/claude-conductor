@@ -9,6 +9,7 @@ This blueprint outlines the phased approach to implementing Conductor as a Claud
 ## Phase 1: Core Plugin Structure
 
 ### Goals
+
 - Create plugin manifest
 - Set up directory structure
 - Implement basic command scaffolding
@@ -24,6 +25,7 @@ mkdir -p conductor-claude/{.claude-plugin,commands,agents,skills,hooks,templates
 #### 1.2 Create Plugin Manifest
 
 **`.claude-plugin/plugin.json`**
+
 ```json
 {
   "name": "conductor",
@@ -57,6 +59,7 @@ Start with simplified versions of each command:
 ## Phase 2: Agent Specialization
 
 ### Goals
+
 - Create dedicated agents for planning, implementation, review
 - Wire commands to delegate to agents
 - Test agent handoffs
@@ -65,27 +68,30 @@ Start with simplified versions of each command:
 
 #### 2.1 Create Planner Agent
 
-**`agents/conductor-planner.md`**
+**`agents/planner.md`**
 
 Focus on:
+
 - Requirements extraction
 - Spec.md generation
 - Plan.md generation with TDD structure
 
 #### 2.2 Create Implementer Agent
 
-**`agents/conductor-implementer.md`**
+**`agents/implementer.md`**
 
 Focus on:
+
 - TDD cycle execution
 - Plan progress tracking
 - Quality gate enforcement
 
 #### 2.3 Create Reviewer Agent
 
-**`agents/conductor-reviewer.md`**
+**`agents/reviewer.md`**
 
 Focus on:
+
 - Test coverage verification
 - Manual verification plans
 - Checkpoint creation
@@ -98,7 +104,8 @@ Modify commands to use Task tool with agents:
 ## Specification Generation
 
 Delegate to the planner agent:
-- Use Task tool with subagent_type='conductor-planner'
+
+- Use Task tool with subagent_type='planner'
 - Provide the track description as context
 - Wait for spec.md content
 ```
@@ -114,6 +121,7 @@ Delegate to the planner agent:
 ## Phase 3: Skills Integration
 
 ### Goals
+
 - Create auto-discovered capabilities
 - Implement context awareness
 - Port code styleguides
@@ -135,9 +143,11 @@ Provides TDD guidance during implementation.
 #### 3.3 Port Code Styleguides
 
 **`skills/code-styleguides/`**
+
 - SKILL.md (auto-activation skill, reads from project)
 
 **`templates/code-styleguides/`**
+
 - typescript.md (template copied to project during setup)
 - python.md
 - go.md
@@ -155,6 +165,7 @@ Provides TDD guidance during implementation.
 ## Phase 4: Hooks & Automation
 
 ### Goals
+
 - Implement event-driven behaviors
 - Auto-load context on session start
 - Remind about in-progress work
@@ -166,6 +177,7 @@ Provides TDD guidance during implementation.
 **`hooks/hooks.json`**
 
 Implement:
+
 - SessionStart: Load conductor context
 - PostToolUse: Track plan modifications
 - Stop: Remind about in-progress tracks
@@ -184,6 +196,7 @@ Implement:
 ## Phase 5: Templates & Polish
 
 ### Goals
+
 - Create default templates
 - Add comprehensive error handling
 - Write documentation
@@ -193,6 +206,7 @@ Implement:
 #### 5.1 Create Templates
 
 Port from original Conductor:
+
 - workflow.md
 - product.md template
 - product-guidelines.md template
@@ -201,6 +215,7 @@ Port from original Conductor:
 #### 5.2 Error Handling
 
 Add to all commands:
+
 - Pre-flight checks for conductor directory
 - Validation of required files
 - Graceful failure with helpful messages
@@ -217,6 +232,7 @@ Add to all commands:
 ## Phase 6: Testing & Release
 
 ### Goals
+
 - End-to-end testing
 - Performance optimization
 - Release preparation
@@ -226,6 +242,7 @@ Add to all commands:
 #### 6.1 End-to-End Testing
 
 Full workflow test:
+
 1. Fresh project → /conductor:setup
 2. Create track → /conductor:newTrack
 3. Implement → /conductor:implement
@@ -235,6 +252,7 @@ Full workflow test:
 #### 6.2 Edge Cases
 
 Test:
+
 - Brownfield project detection
 - Resume interrupted setup
 - Multiple tracks
@@ -276,6 +294,7 @@ Use structured approach for user interaction:
 
 ```markdown
 Present options to user:
+
 1. Read current state
 2. Generate options based on context
 3. Present as clear choices
@@ -300,6 +319,7 @@ Leverage Bash tool for git operations:
 ### Error Recovery
 
 Every command should:
+
 1. Check preconditions first
 2. Fail fast with clear messages
 3. Preserve state for resume
@@ -332,11 +352,13 @@ ln -s /path/to/conductor-claude conductor
 ### Debugging
 
 Use verbose mode to see hook output:
+
 ```bash
 claude --verbose
 ```
 
 Check hook execution in debug logs:
+
 ```
 ~/.claude/debug/
 ```

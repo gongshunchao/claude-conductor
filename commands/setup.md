@@ -11,6 +11,7 @@ You are initializing the Conductor context-driven development environment. Follo
 ## Pre-flight Check
 
 1. **Check for existing setup**:
+
    - Use Bash to test if `conductor/setup_state.json` exists: `test -f conductor/setup_state.json && echo "exists" || echo "not found"`
    - If "exists", read the file and offer to resume from last successful step
    - If `last_successful_step` is "complete", inform user setup is already done
@@ -28,6 +29,7 @@ You are initializing the Conductor context-driven development environment. Follo
 Classify the project as **Brownfield** (existing) or **Greenfield** (new):
 
 **Brownfield Indicators** (check in order):
+
 1. `.git` directory exists
 2. `package.json`, `requirements.txt`, `go.mod`, `pom.xml` exists
 3. `src/`, `app/`, or `lib/` directories with code files
@@ -37,6 +39,7 @@ Classify the project as **Brownfield** (existing) or **Greenfield** (new):
 ### 1.2 Execute Based on Maturity
 
 **If Brownfield:**
+
 1. Announce: "Existing project detected. I'll analyze it to understand the current state."
 2. Check git status - warn if uncommitted changes exist
 3. Analyze README.md if present
@@ -45,6 +48,7 @@ Classify the project as **Brownfield** (existing) or **Greenfield** (new):
 6. Present findings for confirmation
 
 **If Greenfield:**
+
 1. Announce: "New project detected. Let's set it up from scratch."
 2. Initialize git if no .git directory: `git init`
 3. Ask: "What do you want to build?"
@@ -54,6 +58,7 @@ Classify the project as **Brownfield** (existing) or **Greenfield** (new):
 ### 1.3 Initialize State
 
 Create `conductor/setup_state.json`:
+
 ```json
 {
   "last_successful_step": "",
@@ -65,6 +70,7 @@ Create `conductor/setup_state.json`:
 ## Phase 2: Context Generation
 
 For each section, follow this pattern:
+
 1. Introduce the section
 2. Ask up to 5 sequential questions
 3. Provide 3 suggested options + "Type your own" + "Auto-generate"
@@ -76,6 +82,7 @@ For each section, follow this pattern:
 ### 2.1 Product Guide (`conductor/product.md`)
 
 Questions to ask:
+
 - Who are the target users?
 - What problems does this solve?
 - What are the key features?
@@ -86,6 +93,7 @@ Update state: `{"last_successful_step": "2.1_product_guide"}`
 ### 2.2 Product Guidelines (`conductor/product-guidelines.md`)
 
 Questions to ask:
+
 - What's the brand voice/tone?
 - Are there design standards to follow?
 - What's the communication style?
@@ -104,6 +112,7 @@ Update state: `{"last_successful_step": "2.3_tech_stack"}`
 **Purpose**: Copy language-specific style guides based on the project's tech stack.
 
 **Process**:
+
 1. Read `conductor/tech-stack.md` to detect languages
 2. Map detected languages to available styleguides:
    - TypeScript/Node.js → `typescript.md`
@@ -124,6 +133,7 @@ Update state: `{"last_successful_step": "2.4_code_styleguides"}`
 ### 2.5 Workflow (`conductor/workflow.md`)
 
 Copy default workflow template, then ask:
+
 1. Test coverage target? (default: 80%)
 2. Commit after each task or phase? (default: task)
 3. Use git notes for summaries? (default: yes)
@@ -145,7 +155,7 @@ ALWAYS use the Task tool to delegate track creation to the planner agent:
 
 ```
 Task tool:
-- subagent_type: 'conductor-planner'
+- subagent_type: 'planner'
 - prompt: |
     Create specification and plan for initial track: <description>
 
@@ -166,6 +176,7 @@ Task tool:
 ```
 
 The planner agent will:
+
 - Conduct interactive questioning to understand requirements
 - Generate spec.md with functional/non-functional requirements
 - Generate plan.md with TDD-structured tasks
@@ -197,6 +208,7 @@ Update state: `{"last_successful_step": "complete"}`
 ## Completion
 
 1. Commit all conductor files:
+
    ```
    git add conductor/
    git commit -m "conductor(setup): Initialize conductor environment"
@@ -204,12 +216,14 @@ Update state: `{"last_successful_step": "complete"}`
 
 2. Announce completion:
    > "Setup complete! Your project now has:
+   >
    > - Product context in conductor/product.md
    > - Tech stack documented in conductor/tech-stack.md
    > - Development workflow in conductor/workflow.md
    > - First track ready in conductor/tracks/
    >
    > Next steps:
+   >
    > - Run `/conductor:implement` to start working on the first track
    > - Run `/conductor:newTrack` to create additional tracks
    > - Run `/conductor:status` to see project progress"

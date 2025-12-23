@@ -11,6 +11,7 @@ Create a new track (feature, bug, or chore) with specification and implementatio
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
+
    - Check for `conductor/tech-stack.md`
    - Check for `conductor/workflow.md`
    - Check for `conductor/product.md`
@@ -25,6 +26,7 @@ Create a new track (feature, bug, or chore) with specification and implementatio
 ### If description provided ($ARGUMENTS)
 
 Use the provided description:
+
 ```
 Track description: $ARGUMENTS
 ```
@@ -32,6 +34,7 @@ Track description: $ARGUMENTS
 ### If no description provided
 
 Ask the user:
+
 > "Please provide a brief description of the track (feature, bug fix, chore) you want to create."
 
 Wait for response.
@@ -39,6 +42,7 @@ Wait for response.
 ## Determine Track Type
 
 Analyze the description to infer type:
+
 - **Feature**: New functionality, "add", "create", "implement"
 - **Bug**: Fix, repair, "fix", "broken", "error"
 - **Chore**: Maintenance, "update", "refactor", "clean"
@@ -49,13 +53,14 @@ Do NOT ask user to classify - infer from description.
 
 ### Interactive Questioning
 
-Delegate to conductor-planner agent or conduct inline:
+Delegate to planner agent or conduct inline:
 
 1. Announce: "I'll ask a few questions to build a comprehensive specification."
 
 2. Ask 3-5 questions based on track type:
 
 **For Features:**
+
 - What problem does this solve?
 - Who is the target user?
 - What's the expected behavior?
@@ -63,11 +68,13 @@ Delegate to conductor-planner agent or conduct inline:
 - How should edge cases be handled?
 
 **For Bugs:**
+
 - What is the current (broken) behavior?
 - What is the expected behavior?
 - Steps to reproduce?
 
 **For Chores:**
+
 - What needs to be updated/changed?
 - What's the scope of the change?
 - Any dependencies affected?
@@ -80,6 +87,7 @@ Delegate to conductor-planner agent or conduct inline:
 ### Draft Specification
 
 Generate spec.md with:
+
 - Overview
 - Functional Requirements (with acceptance criteria)
 - Non-Functional Requirements (if applicable)
@@ -90,6 +98,7 @@ Generate spec.md with:
 ### Review Loop
 
 Present draft:
+
 > "I've drafted the specification. Please review:"
 >
 > ```markdown
@@ -112,6 +121,7 @@ If B, incorporate feedback and re-present.
 ### Generate Plan
 
 Create plan.md with:
+
 - Phases (logical groupings)
 - Tasks (actionable items)
 - Sub-tasks (TDD structure if specified in workflow)
@@ -120,6 +130,7 @@ Create plan.md with:
 ### Structure Requirements
 
 1. **Follow workflow methodology** (e.g., TDD):
+
    ```markdown
    - [ ] Task: Implement user validation
      - [ ] Write tests for email validation
@@ -136,6 +147,7 @@ Create plan.md with:
 ### Review Loop
 
 Present draft:
+
 > "I've created the implementation plan. Please review:"
 >
 > ```markdown
@@ -157,16 +169,19 @@ Example: `user_auth_20241222`
 ### Check for Duplicates
 
 If track ID matches existing track:
+
 > "A track with similar name already exists. Choose a different name."
 
 ### Create Files
 
 1. **Create directory**:
+
    ```
    conductor/tracks/<track_id>/
    ```
 
 2. **Write metadata.json**:
+
    ```json
    {
      "track_id": "<track_id>",
@@ -189,19 +204,21 @@ If track ID matches existing track:
 Append to `conductor/tracks.md`:
 
 ```markdown
-
 ---
 
 ## [ ] Track: <Track Description>
-*Link: [./conductor/tracks/<track_id>/](./conductor/tracks/<track_id>/)*
+
+_Link: [./conductor/tracks/<track_id>/](./conductor/tracks/<track_id>/)_
 ```
 
 ## Completion
 
 Announce:
+
 > "New track '<track_id>' has been created!
 >
 > Files created:
+>
 > - conductor/tracks/<track_id>/spec.md
 > - conductor/tracks/<track_id>/plan.md
 > - conductor/tracks/<track_id>/metadata.json
@@ -209,6 +226,7 @@ Announce:
 > The track has been added to conductor/tracks.md.
 >
 > Next steps:
+>
 > - Review the spec and plan in your editor
 > - Run `/conductor:implement` to start working
 > - Run `/conductor:status` to see all tracks"

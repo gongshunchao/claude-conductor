@@ -11,6 +11,7 @@ Create a new track (feature, bug, or chore) with specification and implementatio
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
+
    - Check for `conductor/tech-stack.md`
    - Check for `conductor/workflow.md`
    - Check for `conductor/product.md`
@@ -26,6 +27,7 @@ Create a new track (feature, bug, or chore) with specification and implementatio
 ### If description provided ($ARGUMENTS)
 
 Use the provided description:
+
 ```
 Track description: $ARGUMENTS
 ```
@@ -33,6 +35,7 @@ Track description: $ARGUMENTS
 ### If no description provided
 
 Ask the user:
+
 > "Please provide a brief description of the track (feature, bug fix, chore) you want to create."
 
 Wait for response.
@@ -40,6 +43,7 @@ Wait for response.
 ## Determine Track Type
 
 Analyze the description to infer type:
+
 - **Feature**: New functionality, "add", "create", "implement"
 - **Bug**: Fix, repair, "fix", "broken", "error"
 - **Chore**: Maintenance, "update", "refactor", "clean"
@@ -52,7 +56,7 @@ ALWAYS use the Task tool to delegate specification and plan generation to the pl
 
 ```
 Task tool:
-- subagent_type: 'conductor-planner'
+- subagent_type: 'planner'
 - prompt: |
     Create specification and plan for track: <description>
     Track type: <feature|bug|chore>
@@ -73,6 +77,7 @@ Task tool:
 ```
 
 The planner agent will:
+
 - Conduct interactive questioning based on track type
 - Generate spec.md with functional/non-functional requirements
 - Generate plan.md with TDD-structured tasks
@@ -85,6 +90,7 @@ After planner agent returns:
 ### Specification Review
 
 Present the spec.md:
+
 > "I've drafted the specification. Please review:"
 >
 > ```markdown
@@ -100,6 +106,7 @@ If B, incorporate feedback and re-generate with planner agent.
 ### Plan Review
 
 Present the plan.md:
+
 > "I've created the implementation plan. Please review:"
 >
 > ```markdown
@@ -123,16 +130,19 @@ Example: `user_auth_20241222`
 ### Check for Duplicates
 
 If track ID matches existing track:
+
 > "A track with similar name already exists. Choose a different name."
 
 ### Create Files
 
 1. **Create directory**:
+
    ```
    conductor/tracks/<track_id>/
    ```
 
 2. **Write metadata.json**:
+
    ```json
    {
      "track_id": "<track_id>",
@@ -155,19 +165,21 @@ If track ID matches existing track:
 Append to `conductor/tracks.md`:
 
 ```markdown
-
 ---
 
 ## [ ] Track: <Track Description>
-*Link: [./conductor/tracks/<track_id>/](./conductor/tracks/<track_id>/)*
+
+_Link: [./conductor/tracks/<track_id>/](./conductor/tracks/<track_id>/)_
 ```
 
 ## Completion
 
 Announce:
+
 > "New track '<track_id>' has been created!
 >
 > Files created:
+>
 > - conductor/tracks/<track_id>/spec.md
 > - conductor/tracks/<track_id>/plan.md
 > - conductor/tracks/<track_id>/metadata.json
@@ -175,6 +187,7 @@ Announce:
 > The track has been added to conductor/tracks.md.
 >
 > Next steps:
+>
 > - Review the spec and plan in your editor
 > - Run `/conductor:implement` to start working
 > - Run `/conductor:status` to see all tracks"

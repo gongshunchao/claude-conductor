@@ -11,6 +11,7 @@ Execute the implementation workflow for the selected track.
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
+
    - Use Bash to check required files exist:
      ```bash
      test -f conductor/tech-stack.md && test -f conductor/workflow.md && test -f conductor/product.md && echo "ready" || echo "missing"
@@ -46,6 +47,7 @@ Before starting, check if resuming from a previous handoff:
 1. **Check for handoff state**: Look for `conductor/tracks/<track_id>/handoff-state.json`
 
 2. **If handoff state exists**:
+
    - Read the handoff state to get resume context
    - Announce: "Resuming from handoff at phase '<phase>', task '<next_task>'"
    - Clear `.context_usage` file to reset threshold tracking
@@ -63,6 +65,7 @@ Before starting, check if resuming from a previous handoff:
 ### Load Track Context
 
 Read into context:
+
 - `conductor/tracks/<track_id>/plan.md`
 - `conductor/tracks/<track_id>/spec.md`
 - `conductor/workflow.md`
@@ -77,7 +80,7 @@ ALWAYS use the Task tool to delegate task execution to the implementer agent:
 
 ```
 Task tool:
-- subagent_type: 'conductor-implementer'
+- subagent_type: 'implementer'
 - prompt: |
     Execute task: <task description>
 
@@ -102,6 +105,7 @@ Task tool:
 ```
 
 The implementer agent will:
+
 - Execute the full TDD cycle
 - Commit code changes with proper messages
 - Update plan.md with progress
@@ -113,7 +117,7 @@ When all tasks in a phase are complete, delegate to reviewer agent:
 
 ```
 Task tool:
-- subagent_type: 'conductor-reviewer'
+- subagent_type: 'reviewer'
 - prompt: |
     Verify phase: <phase name>
 
@@ -136,6 +140,7 @@ Task tool:
 ```
 
 The reviewer agent will:
+
 - Verify test coverage for phase changes
 - Run full test suite
 - Generate manual verification steps
@@ -243,11 +248,13 @@ When all phases complete:
 1. **Update tracks.md**: Change `## [~] Track:` to `## [x] Track:`
 
 2. **Synchronize Documentation**:
+
    - Review if product.md needs updates
    - Review if tech-stack.md needs updates
    - Propose changes, await approval before writing
 
 3. **Offer Cleanup**:
+
    ```
    Track '<description>' complete! Options:
    A) Archive: Move to conductor/archive/

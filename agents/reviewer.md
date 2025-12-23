@@ -1,5 +1,5 @@
 ---
-name: conductor-reviewer
+name: reviewer
 description: Specialist for phase verification, test coverage analysis, and checkpoint creation. Use at end of each phase to verify quality and create checkpoints.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet

@@ -15,9 +15,9 @@ conductor-claude/
 │   ├── status.md                      # /conductor:status
 │   └── revert.md                      # /conductor:revert
 ├── agents/
-│   ├── conductor-planner.md           # Planning/spec generation
-│   ├── conductor-implementer.md       # Task execution
-│   └── conductor-reviewer.md          # Verification/checkpoints
+│   ├── planner.md                     # Planning/spec generation
+│   ├── implementer.md                 # Task execution
+│   └── reviewer.md                    # Verification/checkpoints
 ├── skills/
 │   ├── context-awareness/
 │   │   └── SKILL.md                   # Auto-loads conductor/ context
@@ -75,12 +75,12 @@ conductor-claude/
 
 ### Command Frontmatter Options
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `description` | string | Brief description (shown in help) |
-| `argument-hint` | string | Expected arguments format |
-| `allowed-tools` | string | Comma-separated tool list |
-| `model` | string | Specific model to use |
+| Field           | Type   | Description                       |
+| --------------- | ------ | --------------------------------- |
+| `description`   | string | Brief description (shown in help) |
+| `argument-hint` | string | Expected arguments format         |
+| `allowed-tools` | string | Comma-separated tool list         |
+| `model`         | string | Specific model to use             |
 
 ### `/conductor:setup`
 
@@ -98,10 +98,12 @@ Initialize the Conductor context-driven development environment.
 ## Pre-flight
 
 Check for existing conductor/ directory:
+
 - If exists with setup_state.json, offer to resume
 - If exists without state, warn about overwrite
 
 ## Phase 1: Project Discovery
+
 ...
 ```
 
@@ -172,13 +174,13 @@ Git-aware revert that understands logical work units.
 
 ## Agents
 
-### conductor-planner
+### planner
 
 **Purpose:** Generate specifications and implementation plans.
 
 ```markdown
 ---
-name: conductor-planner
+name: planner
 description: Specialist for generating specifications and implementation plans. Use when creating new tracks, writing specs, or breaking down features into tasks.
 tools: Read, Write, Glob, Grep
 model: inherit
@@ -188,18 +190,19 @@ You are the Conductor Planning Agent...
 ```
 
 **Responsibilities:**
+
 - Requirements analysis
 - Specification writing (spec.md)
 - Task decomposition (plan.md)
 - TDD task structuring
 
-### conductor-implementer
+### implementer
 
 **Purpose:** Execute tasks following TDD workflow.
 
 ```markdown
 ---
-name: conductor-implementer
+name: implementer
 description: Specialist for executing implementation tasks following TDD workflow. Use when implementing features, fixing bugs, or working through plan.md tasks.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
@@ -209,18 +212,19 @@ You are the Conductor Implementation Agent...
 ```
 
 **Responsibilities:**
+
 - TDD cycle execution (Red → Green → Refactor)
 - Plan progress updates
 - Git commits with proper messages
 - Quality gate enforcement
 
-### conductor-reviewer
+### reviewer
 
 **Purpose:** Handle verification and checkpoints.
 
 ```markdown
 ---
-name: conductor-reviewer
+name: reviewer
 description: Specialist for phase verification and checkpoint creation. Use when completing phases, running verification protocols, or creating checkpoint commits.
 tools: Read, Bash, Glob, Grep
 model: inherit
@@ -230,6 +234,7 @@ You are the Conductor Review Agent...
 ```
 
 **Responsibilities:**
+
 - Test coverage verification
 - Manual verification plan generation
 - Checkpoint commit creation
@@ -273,7 +278,6 @@ When you detect a `conductor/` directory, automatically consider:
 name: tdd-workflow
 description: Test-Driven Development guidance. Use when writing code, implementing features, or fixing bugs in projects that follow TDD methodology.
 ---
-
 # TDD Workflow Skill
 
 ## The TDD Cycle
@@ -300,7 +304,6 @@ description: Test-Driven Development guidance. Use when writing code, implementi
 name: code-styleguides
 description: Language-specific code style guidelines. Use when writing TypeScript, Python, Go, JavaScript, or HTML/CSS code.
 ---
-
 # Code Style Guides
 
 Reads from conductor/code_styleguides/ which are copied during /conductor:setup.
@@ -354,17 +357,18 @@ See templates/code-styleguides/ for available language styleguides.
 
 ### Hook Purposes
 
-| Event | Purpose |
-|-------|---------|
+| Event          | Purpose                           |
+| -------------- | --------------------------------- |
 | `SessionStart` | Show track count on session start |
-| `PostToolUse` | Detect plan.md modifications |
-| `Stop` | Remind about in-progress work |
+| `PostToolUse`  | Detect plan.md modifications      |
+| `Stop`         | Remind about in-progress work     |
 
 ## Templates
 
 Templates are copied during `/conductor:setup`:
 
 ### workflow.md
+
 - Guiding principles
 - Task lifecycle (TDD)
 - Phase completion protocol
@@ -372,12 +376,14 @@ Templates are copied during `/conductor:setup`:
 - Commit guidelines
 
 ### product.md
+
 - Product vision
 - Target users
 - Goals and features
 - Success metrics
 
 ### product-guidelines.md
+
 - Brand voice
 - Design standards
 - Communication style
@@ -386,12 +392,13 @@ Templates are copied during `/conductor:setup`:
 
 Plugins can use these variables:
 
-| Variable | Description |
-|----------|-------------|
+| Variable                | Description                       |
+| ----------------------- | --------------------------------- |
 | `${CLAUDE_PLUGIN_ROOT}` | Absolute path to plugin directory |
-| `${CLAUDE_PROJECT_DIR}` | Project root directory |
+| `${CLAUDE_PROJECT_DIR}` | Project root directory            |
 
 Example in hooks:
+
 ```json
 {
   "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh"
@@ -406,9 +413,7 @@ Add to `~/.claude/settings.json`:
 
 ```json
 {
-  "plugins": [
-    "https://github.com/yourname/conductor-claude"
-  ]
+  "plugins": ["https://github.com/yourname/conductor-claude"]
 }
 ```
 
@@ -418,9 +423,7 @@ Add to `.claude/settings.json`:
 
 ```json
 {
-  "plugins": [
-    "./path/to/conductor-claude"
-  ]
+  "plugins": ["./path/to/conductor-claude"]
 }
 ```
 

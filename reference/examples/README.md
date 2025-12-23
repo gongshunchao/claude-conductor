@@ -15,8 +15,8 @@ examples/
 │   ├── status.md      # /conductor:status
 │   └── revert.md      # /conductor:revert
 ├── agents/            # Specialized subagent definitions
-│   ├── conductor-planner.md      # Planning & specs
-│   └── conductor-implementer.md  # Task execution
+│   ├── planner.md      # Planning & specs
+│   └── implementer.md  # Task execution
 ├── skills/            # Auto-discovered capabilities
 │   ├── context-awareness/
 │   │   └── SKILL.md   # Project context loading
@@ -28,27 +28,27 @@ examples/
 
 ## Commands
 
-| Command | File | Description |
-|---------|------|-------------|
-| `/conductor:setup` | [setup.md](./commands/setup.md) | Initialize project environment |
-| `/conductor:newTrack` | [new-track.md](./commands/new-track.md) | Create feature/bug track |
-| `/conductor:implement` | [implement.md](./commands/implement.md) | Execute tasks with TDD |
-| `/conductor:status` | [status.md](./commands/status.md) | Display progress report |
-| `/conductor:revert` | [revert.md](./commands/revert.md) | Git-aware rollback |
+| Command                | File                                    | Description                    |
+| ---------------------- | --------------------------------------- | ------------------------------ |
+| `/conductor:setup`     | [setup.md](./commands/setup.md)         | Initialize project environment |
+| `/conductor:newTrack`  | [new-track.md](./commands/new-track.md) | Create feature/bug track       |
+| `/conductor:implement` | [implement.md](./commands/implement.md) | Execute tasks with TDD         |
+| `/conductor:status`    | [status.md](./commands/status.md)       | Display progress report        |
+| `/conductor:revert`    | [revert.md](./commands/revert.md)       | Git-aware rollback             |
 
 ## Agents
 
-| Agent | File | Purpose |
-|-------|------|---------|
-| Planner | [conductor-planner.md](./agents/conductor-planner.md) | Generate specs and plans |
-| Implementer | [conductor-implementer.md](./agents/conductor-implementer.md) | Execute TDD workflow |
+| Agent       | File                                      | Purpose                  |
+| ----------- | ----------------------------------------- | ------------------------ |
+| Planner     | [planner.md](./agents/planner.md)         | Generate specs and plans |
+| Implementer | [implementer.md](./agents/implementer.md) | Execute TDD workflow     |
 
 ## Skills
 
-| Skill | Directory | Auto-Activates When |
-|-------|-----------|---------------------|
+| Skill             | Directory                                         | Auto-Activates When           |
+| ----------------- | ------------------------------------------------- | ----------------------------- |
 | Context Awareness | [context-awareness/](./skills/context-awareness/) | `conductor/` directory exists |
-| TDD Workflow | [tdd-workflow/](./skills/tdd-workflow/) | Implementing features |
+| TDD Workflow      | [tdd-workflow/](./skills/tdd-workflow/)           | Implementing features         |
 
 ## Hooks
 
@@ -112,13 +112,17 @@ allowed-tools: Read, Glob
 
 ```json
 {
-  "EventName": [{
-    "matcher": "pattern",
-    "hooks": [{
-      "type": "command",
-      "command": "bash command",
-      "timeout": 5
-    }]
-  }]
+  "EventName": [
+    {
+      "matcher": "pattern",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash command",
+          "timeout": 5
+        }
+      ]
+    }
+  ]
 }
 ```

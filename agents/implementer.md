@@ -1,5 +1,5 @@
 ---
-name: conductor-implementer
+name: implementer
 description: Specialist for executing implementation tasks following TDD workflow. Use when implementing features, fixing bugs, or working through plan.md tasks.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet

@@ -1,5 +1,5 @@
 ---
-name: conductor-planner
+name: planner
 description: Specialist for generating specifications and implementation plans. Use when creating new tracks, writing specs, or breaking down features into tasks.
 tools: Read, Write, Glob, Grep
 model: opus
