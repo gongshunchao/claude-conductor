@@ -14,19 +14,45 @@ The default development workflow template that defines:
 - **Quality Gates**: Pre-commit checklist
 - **Commit Guidelines**: Conventional commit format
 
+### `code-styleguides/`
+
+Language-specific code style guidelines that provide:
+
+- **Naming Conventions**: Language-specific naming patterns (camelCase, snake_case, etc.)
+- **Type Definitions**: Type annotation and definition patterns
+- **Function Patterns**: How to structure functions, parameters, and returns
+- **Error Handling**: Language-specific error handling best practices
+- **Module Organization**: Import/export patterns and file structure
+- **Testing Patterns**: Language-specific test patterns and examples
+
+Available styleguides:
+- `typescript.md` - TypeScript/TSX code style
+- `python.md` - Python code style
+- `go.md` - Go code style
+- `javascript.md` - JavaScript/JSX code style
+- `html-css.md` - HTML/CSS code style
+
 ## How Templates Are Used
 
 During `/conductor:setup`:
 
 1. **Workflow**: The `workflow.md` template is copied to `conductor/workflow.md`
-2. **Customization**: User is prompted to customize settings (coverage target, commit strategy, etc.)
-3. **Tech-specific**: Language-specific settings are added based on detected tech stack
+2. **Code Styleguides**: Selected language styleguides are copied from `code-styleguides/` to `conductor/code_styleguides/`
+   - Languages are detected from the tech stack
+   - User can add additional languages if needed
+   - Only selected languages are copied (not all 5)
+3. **Customization**: User is prompted to customize settings (coverage target, commit strategy, etc.)
+4. **Tech-specific**: Language-specific settings are added based on detected tech stack
 
 ## Customizing Templates
 
 ### Project-Level Overrides
 
-After setup, you can edit `conductor/workflow.md` directly. Changes are tracked in git and apply only to your project.
+After setup, you can edit conductor files directly:
+- **Workflow**: Edit `conductor/workflow.md` for project-specific workflow changes
+- **Styleguides**: Edit files in `conductor/code_styleguides/` for project-specific style rules
+
+Changes are tracked in git and apply only to your project.
 
 ### Plugin-Level Customization
 

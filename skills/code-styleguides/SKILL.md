@@ -8,15 +8,19 @@ allowed-tools: Read, Glob
 
 This skill provides language-specific coding standards and best practices.
 
-## Available Styleguides
+## How It Works
 
-| Language | File Extension | Styleguide |
-|----------|----------------|------------|
-| TypeScript | `.ts`, `.tsx` | [references/typescript.md](references/typescript.md) |
-| Python | `.py` | [references/python.md](references/python.md) |
-| Go | `.go` | [references/go.md](references/go.md) |
-| JavaScript | `.js`, `.jsx` | [references/javascript.md](references/javascript.md) |
-| HTML/CSS | `.html`, `.css`, `.scss` | [references/html-css.md](references/html-css.md) |
+This skill reads project-level styleguides from `conductor/code_styleguides/`. These files are copied to your project during `/conductor:setup` based on your tech stack.
+
+## Supported Languages
+
+| Language | File Extension | Styleguide Location |
+|----------|----------------|---------------------|
+| TypeScript | `.ts`, `.tsx` | `conductor/code_styleguides/typescript.md` |
+| Python | `.py` | `conductor/code_styleguides/python.md` |
+| Go | `.go` | `conductor/code_styleguides/go.md` |
+| JavaScript | `.js`, `.jsx` | `conductor/code_styleguides/javascript.md` |
+| HTML/CSS | `.html`, `.css`, `.scss` | `conductor/code_styleguides/html-css.md` |
 
 ## When to Activate
 
@@ -35,11 +39,13 @@ Automatically apply the relevant styleguide based on file extension:
 - **JavaScript**: `.js`, `.jsx`, `.mjs`, `.cjs`
 - **HTML/CSS**: `.html`, `.htm`, `.css`, `.scss`, `.sass`, `.less`
 
-## Project-Level Overrides
+## Setup Required
 
-If the project has custom styleguides at `conductor/code_styleguides/`, those take precedence over these defaults.
+If styleguides don't exist in your project:
+1. Run `/conductor:setup` to initialize the conductor environment
+2. Or manually copy templates from `templates/code-styleguides/` to `conductor/code_styleguides/`
 
-Check for project overrides:
+Check for styleguides:
 ```bash
 ls conductor/code_styleguides/
 ```

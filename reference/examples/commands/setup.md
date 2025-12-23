@@ -99,8 +99,23 @@ Update state: `{"last_successful_step": "2.3_tech_stack"}`
 
 ### 2.4 Code Styleguides (`conductor/code_styleguides/`)
 
-Based on tech stack, recommend appropriate style guides.
-Copy relevant guides from plugin templates.
+**Purpose**: Copy language-specific style guides based on the project's tech stack.
+
+**Process**:
+1. Read `conductor/tech-stack.md` to detect languages
+2. Map detected languages to available styleguides:
+   - TypeScript/Node.js → `typescript.md`
+   - Python → `python.md`
+   - Go/Golang → `go.md`
+   - JavaScript → `javascript.md`
+   - HTML/CSS/Frontend → `html-css.md`
+3. Present detected languages: "Based on your tech stack, I'll include styleguides for: [list]"
+4. Ask: "Would you like to add styleguides for any other languages?"
+   - Options: TypeScript, Python, Go, JavaScript, HTML/CSS (only show ones not already selected)
+   - Allow multiple selections
+5. Create `conductor/code_styleguides/` directory
+6. Copy selected styleguide files from `templates/code-styleguides/` to `conductor/code_styleguides/`
+7. Inform user: "You can customize these styleguides by editing files in `conductor/code_styleguides/`"
 
 Update state: `{"last_successful_step": "2.4_code_styleguides"}`
 

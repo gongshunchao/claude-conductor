@@ -250,7 +250,7 @@ The workflow enforces these checks before task completion:
 
 ### Code Styleguides
 
-Language-specific style guides are available in `skills/code-styleguides/references/`:
+Language-specific style guides are provided in `templates/code-styleguides/`:
 
 - TypeScript
 - Python
@@ -258,7 +258,7 @@ Language-specific style guides are available in `skills/code-styleguides/referen
 - JavaScript
 - HTML/CSS
 
-These auto-activate when writing code in the respective language.
+During `/conductor:setup`, selected styleguides are copied to `conductor/code_styleguides/` based on your tech stack. The `code-styleguides` skill auto-activates when writing code, reading from your project's styleguide files.
 
 ## Project Structure
 

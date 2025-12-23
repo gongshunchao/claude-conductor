@@ -24,18 +24,17 @@ conductor-claude/
 │   ├── tdd-workflow/
 │   │   └── SKILL.md                   # TDD guidance
 │   └── code-styleguides/
-│       ├── SKILL.md                   # Style guide skill
+│       └── SKILL.md                   # Style guide skill (reads from project)
+├── hooks/
+│   └── hooks.json                     # Event-driven automations
+├── templates/
+│   ├── workflow.md                    # Default workflow template
+│   └── code-styleguides/              # Language-specific style templates
 │       ├── typescript.md
 │       ├── python.md
 │       ├── go.md
 │       ├── javascript.md
 │       └── html-css.md
-├── hooks/
-│   └── hooks.json                     # Event-driven automations
-├── templates/
-│   ├── workflow.md                    # Default workflow template
-│   ├── product.md                     # Product template
-│   └── product-guidelines.md          # Guidelines template
 ├── LICENSE
 └── README.md
 ```
@@ -294,7 +293,7 @@ description: Test-Driven Development guidance. Use when writing code, implementi
 
 ### code-styleguides
 
-**Auto-discovers** when writing code in specific languages.
+**Auto-discovers** when writing code in specific languages. Reads styleguides from `conductor/code_styleguides/` in the project.
 
 ```yaml
 ---
@@ -304,7 +303,8 @@ description: Language-specific code style guidelines. Use when writing TypeScrip
 
 # Code Style Guides
 
-See language-specific files for detailed guidelines.
+Reads from conductor/code_styleguides/ which are copied during /conductor:setup.
+See templates/code-styleguides/ for available language styleguides.
 ```
 
 ## Hooks

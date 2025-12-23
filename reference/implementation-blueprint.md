@@ -135,8 +135,10 @@ Provides TDD guidance during implementation.
 #### 3.3 Port Code Styleguides
 
 **`skills/code-styleguides/`**
-- SKILL.md (main skill file)
-- typescript.md
+- SKILL.md (auto-activation skill, reads from project)
+
+**`templates/code-styleguides/`**
+- typescript.md (template copied to project during setup)
 - python.md
 - go.md
 - javascript.md
