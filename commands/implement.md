@@ -11,13 +11,16 @@ Execute the implementation workflow for the selected track.
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
-   - Check for `conductor/tech-stack.md`
-   - Check for `conductor/workflow.md`
-   - Check for `conductor/product.md`
-   - If any missing: "Conductor is not set up. Please run `/conductor:setup` first."
+   - Use Bash to check required files exist:
+     ```bash
+     test -f conductor/tech-stack.md && test -f conductor/workflow.md && test -f conductor/product.md && echo "ready" || echo "missing"
+     ```
+   - If "missing": "Conductor is not set up. Please run `/conductor:setup` first."
 
 2. **Check for tracks**:
-   - Parse `conductor/tracks.md`
+   - Use Bash to check: `test -f conductor/tracks.md && echo "exists" || echo "not found"`
+   - If "not found": "No tracks found. Create one with `/conductor:newTrack`."
+   - If "exists", read and parse `conductor/tracks.md`
    - If empty or malformed: "No tracks found. Create one with `/conductor:newTrack`."
 
 ## Track Selection

@@ -17,8 +17,9 @@ Create a new track (feature, bug, or chore) with specification and implementatio
    - If any missing: "Conductor is not set up. Run `/conductor:setup` first."
 
 2. **Check for existing tracks**:
-   - Read `conductor/tracks.md`
-   - List existing track IDs to avoid duplicates
+   - Use Bash to check if tracks file exists: `test -f conductor/tracks.md && echo "exists" || echo "not found"`
+   - If "exists", read `conductor/tracks.md` and list existing track IDs to avoid duplicates
+   - If "not found", this will be the first track
 
 ## Get Track Description
 

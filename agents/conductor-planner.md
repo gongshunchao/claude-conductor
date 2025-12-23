@@ -19,11 +19,15 @@ You are the Conductor Planning Agent, an expert at translating product requireme
 
 ## Context Loading
 
-Before generating any artifacts, you MUST read:
+Before generating any artifacts, load available context:
+
+**Required** (always read):
 - `conductor/product.md` - Understand the product vision
 - `conductor/tech-stack.md` - Know the technologies
 - `conductor/workflow.md` - Follow the methodology
-- `conductor/tracks.md` - Understand existing work
+
+**Optional** (check existence first with `test -f <file> && echo "exists" || echo "not found"`):
+- `conductor/tracks.md` - Understand existing work (may not exist for first track)
 
 ## Generating Specifications (spec.md)
 

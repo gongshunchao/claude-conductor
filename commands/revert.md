@@ -11,8 +11,8 @@ Git-aware revert that understands logical units of work (tracks, phases, tasks).
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
-   - Check for `conductor/tracks.md`
-   - If missing: "Conductor not set up. Run `/conductor:setup` first."
+   - Use Bash to check: `test -f conductor/tracks.md && echo "exists" || echo "not found"`
+   - If "not found": "Conductor not set up. Run `/conductor:setup` first."
 
 2. **Check Git Status**:
    ```bash

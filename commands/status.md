@@ -9,9 +9,9 @@ Display a comprehensive status overview of the project.
 
 ## Pre-flight Check
 
-1. Verify `conductor/tracks.md` exists
-2. If missing: "Conductor not set up. Run `/conductor:setup` to initialize."
-3. Verify file is not empty
+1. Use Bash to check if tracks file exists: `test -f conductor/tracks.md && echo "exists" || echo "not found"`
+2. If "not found": "Conductor not set up. Run `/conductor:setup` to initialize."
+3. If "exists", read `conductor/tracks.md` and verify it is not empty
 4. If empty: "No tracks found. Create one with `/conductor:newTrack`."
 
 ## Gather Data
