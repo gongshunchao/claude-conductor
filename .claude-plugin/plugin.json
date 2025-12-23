@@ -7,5 +7,6 @@
     "./agents/conductor-planner.md",
     "./agents/conductor-implementer.md",
     "./agents/conductor-reviewer.md"
-  ]
+  ],
+  "skills": "./skills/"
 }
