@@ -2,6 +2,7 @@
 description: Revert a track, phase, or task using git-aware rollback
 argument-hint: [track|phase|task] [name]
 allowed-tools: Read, Bash, Glob, Grep
+model: haiku
 ---
 
 # Conductor Revert
@@ -11,6 +12,7 @@ Git-aware revert that understands logical units of work (tracks, phases, tasks).
 ## Pre-flight Checks
 
 1. **Verify Conductor Setup**:
+
    - Use Bash to check: `test -f conductor/tracks.md && echo "exists" || echo "not found"`
    - If "not found": "Conductor not set up. Run `/conductor:setup` first."
 
@@ -25,6 +27,7 @@ Git-aware revert that understands logical units of work (tracks, phases, tasks).
 ### If target provided ($ARGUMENTS)
 
 Parse the argument:
+
 - `track <name>` → Revert entire track
 - `phase <name>` → Revert specific phase
 - `task <name>` → Revert specific task
@@ -34,16 +37,20 @@ Search for matching item in tracks and plans.
 ### If no target provided
 
 1. **Scan for revert candidates**:
+
    - Read `conductor/tracks.md`
    - Read all `conductor/tracks/*/plan.md`
 
 2. **Prioritize in-progress items**:
+
    - Find all `[~]` marked tracks, phases, tasks
 
 3. **Fallback to recently completed**:
+
    - If no in-progress items, show 5 most recent `[x]` items
 
 4. **Present menu**:
+
    ```
    I found the following items that can be reverted:
 
@@ -77,20 +84,24 @@ Search for matching item in tracks and plans.
 
 1. **Read the plan.md** for the target item
 2. **Extract commit SHAs** from completed tasks:
+
    ```
    - [x] Task: Implement JWT validation [a1b2c3d]
    ```
 
 3. **Verify commits exist**:
+
    ```bash
    git cat-file -t <sha>
    ```
 
 4. **Handle missing commits** (rewritten history):
+
    > "Commit a1b2c3d not found. It may have been rebased.
    > Searching for similar commit..."
 
    Search by commit message:
+
    ```bash
    git log --oneline --all | grep "Implement JWT"
    ```
@@ -100,11 +111,13 @@ Search for matching item in tracks and plans.
 ### Identify Plan Update Commits
 
 For each implementation commit, find the corresponding plan update:
+
 ```bash
 git log --oneline -- conductor/tracks/<id>/plan.md
 ```
 
 Look for commits with messages like:
+
 - `conductor(plan): Complete 'Implement JWT validation'`
 - `conductor(checkpoint): Complete phase 'Backend API'`
 
@@ -117,6 +130,7 @@ git log --oneline -- conductor/tracks.md | grep "Track: <description>"
 ### Compile Final List
 
 Create ordered list of all commits to revert:
+
 1. Most recent first
 2. Include both implementation and plan commits
 3. Note any merge commits that need special handling
@@ -146,10 +160,12 @@ B) No, cancel
 ### Warnings
 
 If merge commits found:
+
 > "WARNING: Commit <sha> is a merge commit. Reverting may be complex.
 > Consider manually reverting or using `git revert -m 1`."
 
 If commits are very old:
+
 > "Note: These commits are from <date>. There may be dependent code
 > that will break. Review carefully after revert."
 
@@ -158,6 +174,7 @@ If commits are very old:
 ### Execute Reverts
 
 For each commit (newest to oldest):
+
 ```bash
 git revert --no-edit <sha>
 ```
@@ -165,6 +182,7 @@ git revert --no-edit <sha>
 ### Handle Conflicts
 
 If conflict occurs:
+
 ```
 Conflict detected while reverting commit <sha>.
 
@@ -179,17 +197,20 @@ Please choose how to proceed.
 ```
 
 If A:
+
 - Show the conflict markers
 - Wait for user to resolve
 - Continue with: `git add . && git revert --continue`
 
 If B:
+
 - Run: `git revert --abort`
 - Announce: "Revert aborted. Repository is back to previous state."
 
 ### Verify Plan State
 
 After reverts complete:
+
 1. Read the affected plan.md
 2. Check if task/phase status matches reverted state
 3. If not, edit to fix:

@@ -1,6 +1,7 @@
 ---
 description: Display current progress of Conductor-managed project
 allowed-tools: Read, Glob, Bash
+model: haiku
 ---
 
 # Conductor Status
@@ -24,6 +25,7 @@ Display a comprehensive status overview of the project.
 ### Parse Each Track
 
 For each track directory in `conductor/tracks/`:
+
 1. Read `plan.md`
 2. Count tasks by status:
    - `[ ]` = Pending
@@ -119,6 +121,7 @@ If any task is marked with "BLOCKED" in the plan:
 ### Summary Statistics
 
 At the end, provide:
+
 - Total phases across all tracks
 - Total tasks across all tracks
 - Overall completion percentage
