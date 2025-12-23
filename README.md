@@ -4,6 +4,16 @@ Context-Driven Development framework for Claude Code.
 
 > Inspired by [Conductor for Gemini CLI](https://github.com/gemini-cli-extensions/conductor)
 
+## Overview
+
+Conductor enables **Context-Driven Development** - a methodology where context is treated as a managed artifact alongside code. It provides:
+
+- **Pre-implementation Planning**: Generate specs and plans before coding
+- **Test-Driven Development**: Enforced Red-Green-Refactor cycles
+- **Context Management**: Maintain style guides, tech stack, product goals
+- **Iterative Safety**: Review plans before execution with checkpoints
+- **Intelligent Reversion**: Git-aware rollback of logical work units
+
 ## Installation
 
 ### Development / Testing
@@ -14,6 +24,17 @@ Load the plugin directly using the `--plugin-dir` flag:
 claude --plugin-dir /path/to/conductor
 ```
 
+**Verify installation:**
+```bash
+# Start Claude Code with the plugin
+claude --plugin-dir /path/to/conductor
+
+# Type /conductor: to see available commands
+/conductor:
+```
+
+You should see the 5 conductor commands listed.
+
 ### Production (via Marketplace)
 
 Once published to a marketplace, install with:
@@ -22,33 +43,222 @@ Once published to a marketplace, install with:
 claude plugin install conductor@<marketplace-name>
 ```
 
+### Symlink Installation (Alternative)
+
+```bash
+# Create plugins directory if it doesn't exist
+mkdir -p ~/.claude/plugins
+
+# Symlink the conductor plugin
+ln -s /path/to/conductor ~/.claude/plugins/conductor
+```
+
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/conductor:setup` | Initialize Conductor environment for a project |
-| `/conductor:newTrack` | Create a new feature, bug, or chore track |
-| `/conductor:implement` | Execute tasks following TDD workflow |
-| `/conductor:status` | Display project progress report |
-| `/conductor:revert` | Git-aware rollback of tracks, phases, or tasks |
+### `/conductor:setup`
 
-## Quick Start
+Initialize Conductor environment for a project.
 
-1. Start Claude Code with the plugin: `claude --plugin-dir /path/to/conductor`
-2. Navigate to your project directory
-3. Run `/conductor:setup` to initialize
-4. Run `/conductor:newTrack` to create your first track
-5. Run `/conductor:implement` to start working
+**Usage:**
+```
+/conductor:setup [brownfield|greenfield]
+```
 
-## How It Works
+**Arguments:**
+- `brownfield` - Skip detection, treat as existing project
+- `greenfield` - Skip detection, treat as new project
 
-Conductor establishes a structured development workflow:
+**What it does:**
+1. Detects project maturity (brownfield vs greenfield)
+2. Creates `conductor/` directory with context files
+3. Interactively generates `product.md`, `tech-stack.md`, `workflow.md`
+4. Creates first track with specification and plan
 
-1. **Setup** creates project context files (`conductor/product.md`, `conductor/tech-stack.md`, etc.)
-2. **Tracks** represent units of work (features, bugs, chores) with specifications and plans
-3. **Implementation** follows TDD methodology with checkpoints and verification
-4. **Status** provides visibility into project progress
-5. **Revert** enables safe rollback to previous states
+**Example:**
+```
+> /conductor:setup
+
+Existing project detected. I'll analyze it to understand the current state.
+Found: package.json, src/, .git
+
+What do you want to build? [describe your first feature]
+```
+
+---
+
+### `/conductor:newTrack`
+
+Create a new feature, bug, or chore track.
+
+**Usage:**
+```
+/conductor:newTrack [description]
+```
+
+**Arguments:**
+- `description` - Brief description of the work (optional, will prompt if not provided)
+
+**What it does:**
+1. Infers track type (feature/bug/chore) from description
+2. Delegates to planner agent for interactive Q&A
+3. Generates `spec.md` with requirements
+4. Generates `plan.md` with TDD-structured tasks
+5. Creates track directory and updates `tracks.md`
+
+**Example:**
+```
+> /conductor:newTrack Add user authentication with OAuth
+
+Creating feature track...
+I have some questions to clarify the requirements:
+1. Which OAuth providers should be supported?
+2. Should we include "remember me" functionality?
+...
+```
+
+---
+
+### `/conductor:implement`
+
+Execute tasks following TDD workflow.
+
+**Usage:**
+```
+/conductor:implement [track-name]
+```
+
+**Arguments:**
+- `track-name` - Partial name to select specific track (optional, selects next incomplete)
+
+**What it does:**
+1. Selects next incomplete track (or specified track)
+2. Delegates each task to implementer agent
+3. Follows TDD cycle: Red → Green → Refactor
+4. Creates atomic commits with git notes
+5. Triggers phase verification at phase boundaries
+6. Creates checkpoints with reviewer agent
+
+**Example:**
+```
+> /conductor:implement
+
+Selecting next incomplete track: 'User Authentication'
+Current task: Implement JWT validation
+
+[RED] Writing failing test...
+[GREEN] Implementing to pass...
+[REFACTOR] Cleaning up...
+
+Task complete. Commit: feat(auth): Implement JWT validation [a1b2c3d]
+```
+
+---
+
+### `/conductor:status`
+
+Display project progress report.
+
+**Usage:**
+```
+/conductor:status
+```
+
+**What it does:**
+1. Parses all tracks and plans
+2. Calculates completion percentages
+3. Identifies current focus (in-progress track/phase/task)
+4. Lists any blockers
+5. Shows next actions
+
+**Example output:**
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CONDUCTOR STATUS REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT FOCUS
+───────────────────────────────────────────────────
+  Track: User Authentication
+  Phase: Backend API [~]
+  Task:  Implement JWT validation [~]
+
+PROGRESS
+───────────────────────────────────────────────────
+  [████████████░░░░░░░░] 60%  (12/20 tasks)
+```
+
+---
+
+### `/conductor:revert`
+
+Git-aware rollback of tracks, phases, or tasks.
+
+**Usage:**
+```
+/conductor:revert [track|phase|task] [name]
+```
+
+**Arguments:**
+- `track <name>` - Revert entire track
+- `phase <name>` - Revert specific phase
+- `task <name>` - Revert specific task
+
+**What it does:**
+1. Identifies all commits associated with the target
+2. Finds both implementation and plan update commits
+3. Presents revert plan for confirmation
+4. Executes `git revert` in correct order
+5. Handles conflicts with user guidance
+6. Updates plan.md status markers
+
+**Example:**
+```
+> /conductor:revert phase "Backend API"
+
+I have analyzed the git history. Here is the revert plan:
+
+Commits to revert (newest first):
+  1. b2c3d4e - conductor(plan): Complete 'Add rate limiting'
+  2. a1b2c3d - feat(api): Add rate limiting to endpoints
+
+Do you want to proceed? [Y/n]
+```
+
+## Configuration
+
+### Workflow Customization
+
+Edit `conductor/workflow.md` after setup to customize:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Coverage Target | 80% | Minimum test coverage percentage |
+| Commit Strategy | Per Task | When to commit (per-task or per-phase) |
+| Git Notes | Enabled | Attach summaries to commits |
+| Mobile Testing | If Applicable | Require mobile verification |
+
+### Quality Gates
+
+The workflow enforces these checks before task completion:
+
+- All tests pass
+- Code coverage meets target (>80%)
+- Code follows style guides
+- No linting errors
+- Type safety enforced
+- Documentation updated
+
+### Code Styleguides
+
+Language-specific style guides are available in `skills/code-styleguides/references/`:
+
+- TypeScript
+- Python
+- Go
+- JavaScript
+- HTML/CSS
+
+These auto-activate when writing code in the respective language.
 
 ## Project Structure
 
@@ -61,6 +271,7 @@ your-project/
     ├── product-guidelines.md # Brand and design standards
     ├── tech-stack.md        # Technology choices
     ├── workflow.md          # Development methodology
+    ├── setup_state.json     # Resume capability state
     ├── tracks.md            # Track overview
     └── tracks/
         └── <track_id>/
@@ -69,6 +280,67 @@ your-project/
             └── metadata.json
 ```
 
+## Troubleshooting
+
+### Common Errors
+
+**"Conductor is not set up"**
+```
+Run /conductor:setup first to initialize the conductor/ directory.
+```
+
+**"No tracks found"**
+```
+Run /conductor:newTrack to create your first track.
+```
+
+**"You have uncommitted changes"**
+```
+Commit or stash your changes before running /conductor:revert.
+```
+
+### Prerequisites
+
+Before using Conductor:
+
+1. **Git repository**: Project must be a git repo (or `/conductor:setup` will init one)
+2. **Claude Code**: Version with plugin support
+3. **Test framework**: Project should have testing set up for TDD workflow
+
+### Debug Mode
+
+For verbose output showing hook execution:
+
+```bash
+claude --verbose --plugin-dir /path/to/conductor
+```
+
+Check hook execution logs:
+```
+~/.claude/debug/
+```
+
+### Resuming Interrupted Setup
+
+If setup is interrupted, it can be resumed:
+
+```bash
+# Setup saves state in conductor/setup_state.json
+# Re-running setup will offer to resume from last successful step
+/conductor:setup
+```
+
+## Architecture
+
+Conductor uses Claude Code's plugin system:
+
+| Component | Purpose |
+|-----------|---------|
+| **Commands** (`/conductor:*`) | User-invoked actions |
+| **Agents** | Specialized subagents (planner, implementer, reviewer) |
+| **Skills** | Auto-discovered capabilities (TDD, styleguides, context) |
+| **Hooks** | Event-driven automation (context loading, change tracking) |
+
 ## Documentation
 
 See the `reference/` directory for detailed documentation:
@@ -76,6 +348,7 @@ See the `reference/` directory for detailed documentation:
 - [Implementation Blueprint](reference/implementation-blueprint.md)
 - [Plugin Architecture](reference/plugin-architecture.md)
 - [Claude Code Mapping](reference/claude-code-mapping.md)
+- [Conductor Analysis](reference/conductor-analysis.md)
 
 ## License
 
