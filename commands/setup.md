@@ -1,7 +1,7 @@
 ---
 description: Initialize Conductor environment for context-driven development
 argument-hint: [project-type]
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 ---
 
 # Conductor Setup
@@ -115,28 +115,65 @@ Update state: `{"last_successful_step": "2.5_workflow"}`
 
 ## Phase 3: Initial Track
 
-### 3.1 Gather Requirements (Greenfield only)
+### 3.1 Determine Initial Track Description
 
-Ask about:
-- User stories
-- Functional requirements
-- Non-functional requirements
+**Greenfield:** Ask user what they want to build first (MVP focus)
+**Brownfield:** Ask what enhancement or improvement they want to start with
 
-### 3.2 Propose Initial Track
+Get a brief description of the initial track from the user.
 
-**Greenfield:** Propose MVP track
-**Brownfield:** Propose enhancement or maintenance track
+### 3.2 Delegate to Planner Agent
 
-Present for approval.
+ALWAYS use the Task tool to delegate track creation to the planner agent:
+
+```
+Task tool:
+- subagent_type: 'conductor-planner'
+- prompt: |
+    Create specification and plan for initial track: <description>
+
+    Project type: <brownfield|greenfield>
+
+    Context files to read:
+    - conductor/product.md
+    - conductor/tech-stack.md
+    - conductor/workflow.md
+
+    Requirements:
+    1. Conduct interactive questioning (3-5 questions)
+    2. Generate spec.md following template structure
+    3. Generate plan.md with TDD task structure
+    4. Each phase must end with verification task
+
+    Return both artifacts for user review.
+```
+
+The planner agent will:
+- Conduct interactive questioning to understand requirements
+- Generate spec.md with functional/non-functional requirements
+- Generate plan.md with TDD-structured tasks
+- Return artifacts for review
 
 ### 3.3 Create Track Artifacts
+
+After planner returns artifacts:
 
 1. Generate track ID: `<shortname>_YYYYMMDD`
 2. Create `conductor/tracks.md` with first track entry
 3. Create `conductor/tracks/<track_id>/`
-4. Generate and write `spec.md`
-5. Generate and write `plan.md` (following workflow methodology)
-6. Create `metadata.json`
+4. Write `spec.md` (from planner output)
+5. Write `plan.md` (from planner output)
+6. Create `metadata.json`:
+   ```json
+   {
+     "track_id": "<track_id>",
+     "type": "feature",
+     "status": "new",
+     "created_at": "<ISO timestamp>",
+     "updated_at": "<ISO timestamp>",
+     "description": "<description>"
+   }
+   ```
 
 Update state: `{"last_successful_step": "complete"}`
 
