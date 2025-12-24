@@ -13,7 +13,7 @@
       "name": "conductor",
       "description": "Context-Driven Development framework for Claude Code",
       "version": "0.1.0",
-      "source": ".",
+      "source": "./",
       "author": {
         "name": "Bryan Lackey"
       },
