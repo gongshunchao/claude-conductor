@@ -78,7 +78,7 @@ For each section: (1) Introduce, (2) Ask questions (AskUserQuestion with options
 ALWAYS use Task tool:
 ```
 Task tool:
-- subagent_type: 'planner'
+- subagent_type: 'conductor:planner'
 - prompt: |
     Create spec and plan for initial track: <description>
     Project type: <brownfield|greenfield>

@@ -139,7 +139,7 @@ ALWAYS use the Task tool to delegate task execution to the implementer agent:
 
 ```
 Task tool:
-- subagent_type: 'implementer'
+- subagent_type: 'conductor:implementer'
 - prompt: |
     Execute task: <task description>
 
@@ -190,7 +190,7 @@ For long-running tasks or parallel workflows, run the implementer in background:
 2. **Spawn agent with worktree path**:
    ```
    Task tool:
-   - subagent_type: 'implementer'
+   - subagent_type: 'conductor:implementer'
    - run_in_background: true
    - prompt: |
        WORKING DIRECTORY: .worktrees/implementer-<task_id>
@@ -234,7 +234,7 @@ When all tasks in a phase are complete, delegate to reviewer agent:
 
 ```
 Task tool:
-- subagent_type: 'reviewer'
+- subagent_type: 'conductor:reviewer'
 - prompt: |
     Verify phase: <phase name>
 

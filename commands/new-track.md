@@ -40,7 +40,7 @@ Infer from description (don't ask):
 ALWAYS use Task tool:
 ```
 Task tool:
-- subagent_type: 'planner'
+- subagent_type: 'conductor:planner'
 - prompt: |
     Create specification and implementation plan for: <description>
 
@@ -65,7 +65,7 @@ For large features or when user wants to continue working:
 
 ```
 Task tool:
-- subagent_type: 'planner'
+- subagent_type: 'conductor:planner'
 - run_in_background: true
 - prompt: |
     Create specification and implementation plan for: <description>
