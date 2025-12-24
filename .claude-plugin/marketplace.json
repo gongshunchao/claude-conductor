@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Context-Driven Development framework for Claude Code",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "plugins": [
     {
       "name": "conductor",
       "description": "Context-Driven Development framework for Claude Code",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./",
       "author": {
         "name": "Bryan Lackey"
