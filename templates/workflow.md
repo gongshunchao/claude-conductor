@@ -211,6 +211,7 @@ This workflow can be customized during `/conductor:setup`:
 | Mobile Testing | If Applicable | Required, Optional, Skip |
 | Context Threshold | 70% | 50%, 60%, 70%, 80%, 90%, Disabled |
 | Auto-Handoff | Enabled | Enabled, Disabled |
+| Parallel Agents | worktree | worktree, sequential, unsafe |
 
 ## Context Management
 
@@ -237,3 +238,22 @@ Auto-handoff ensures work is preserved and sessions stay productive by proactive
 - **Auto-Handoff**: Enable/disable automatic handoff (default: Enabled)
 
 Set `Context Threshold` to `Disabled` if you prefer manual session management or have very short tracks.
+
+## Parallel Agent Execution
+
+When running background agents (using `run_in_background: true`), Conductor can isolate agents to prevent git conflicts:
+
+### Strategies
+
+- **worktree** (recommended): Each background agent works in its own git worktree on a separate branch, merged back on completion. Prevents conflicts during parallel execution.
+- **sequential**: Background agents queue and run one at a time. Safe but no true parallelism.
+- **unsafe**: No isolation. Agents work on the same branch. User must manually resolve conflicts. Not recommended for production use.
+
+### How Worktrees Work
+
+1. **Create**: `git worktree add .worktrees/implementer-<id> -b conductor/implementer-<id>`
+2. **Isolate**: Agent works in `.worktrees/implementer-<id>/` directory
+3. **Merge**: On completion, merge `conductor/implementer-<id>` into current branch
+4. **Cleanup**: `git worktree remove .worktrees/implementer-<id>`
+
+Set `Parallel Agents` to `worktree` for safe parallel workflows.

@@ -59,6 +59,30 @@ Task tool:
     Return track_id, file paths, and summary when complete.
 ```
 
+### Background Planning Option
+
+For large features or when user wants to continue working:
+
+```
+Task tool:
+- subagent_type: 'planner'
+- run_in_background: true
+- prompt: |
+    Create specification and implementation plan for: <description>
+    ...
+```
+
+**When to use:**
+- User explicitly requests background execution ("plan this in background")
+- Feature is complex (expected to generate large spec/plan)
+- User wants to work on other tasks while planning proceeds
+
+**Important caveats:**
+- Background planning is NOT recommended for most cases because:
+  - Planner uses interactive questioning (AskUserQuestion) which requires foreground
+  - User feedback is valuable during spec refinement
+- Only use if user explicitly prefers to review completed artifacts without iteration
+
 ## Finalize Track
 
 After planner completes:

@@ -216,6 +216,51 @@ PROGRESS
 
 ---
 
+### `/conductor:agents`
+
+Manage background Conductor agents and git worktrees.
+
+**Usage:**
+```
+/conductor:agents [status|results|worktrees|cleanup]
+```
+
+**Arguments:**
+- `status` (default) - Check background agent status
+- `results` - Retrieve results from completed agents
+- `worktrees` - List git worktrees used for isolation
+- `cleanup` - Remove orphaned worktrees
+
+**What it does:**
+1. Lists running background agents (implementer, planner, reviewer)
+2. Shows worktree isolation status
+3. Retrieves completed agent results
+4. Merges and cleans up worktree branches
+
+**Example:**
+```
+> /conductor:agents
+
+Background Agents:
+  [RUNNING] implementer - Task: Add user validation (worktree: .worktrees/implementer-1735075200)
+
+Worktrees:
+  .worktrees/implementer-1735075200 → conductor/implementer-1735075200
+```
+
+```
+> /conductor:agents results
+
+Implementer completed:
+  ✓ 3 tasks completed
+  ✓ 4 commits created
+  ✓ Checkpoint: a1b2c3d
+
+Merging worktree back to main...
+```
+
+---
+
 ### `/conductor:revert`
 
 Git-aware rollback of tracks, phases, or tasks.
@@ -263,6 +308,7 @@ Edit `conductor/workflow.md` after setup to customize:
 | Commit Strategy | Per Task | When to commit (per-task or per-phase) |
 | Git Notes | Enabled | Attach summaries to commits |
 | Mobile Testing | If Applicable | Require mobile verification |
+| Parallel Agents | worktree | Strategy for parallel agent execution |
 
 ### Quality Gates
 
@@ -286,6 +332,76 @@ Language-specific style guides are provided in `templates/code-styleguides/`:
 - HTML/CSS
 
 During `/conductor:setup`, selected styleguides are copied to `conductor/code_styleguides/` based on your tech stack. The `code-styleguides` skill auto-activates when writing code, reading from your project's styleguide files.
+
+## Background Execution & Parallel Agents
+
+Conductor supports running agents in the background for long-running tasks and parallel workflows.
+
+### When to Use Background Execution
+
+```bash
+# Run implementer in background for long task
+> I want to implement user validation. Can you run that in the background while I work on something else?
+
+# Run multiple tasks in parallel
+> Start implementing authentication in the background, and I'll work on the frontend
+```
+
+### Parallel Agent Strategies
+
+Configure in `conductor/workflow.md`:
+
+| Strategy | Description | Use Case |
+|----------|-------------|----------|
+| **worktree** (recommended) | Each background agent works in isolated git worktree | Parallel development without conflicts |
+| **sequential** | Background agents queue, run one at a time | Safe fallback when worktrees not desired |
+| **unsafe** | No isolation, agents work on same branch | Not recommended (manual conflict resolution) |
+
+### How Worktree Isolation Works
+
+When `parallel_agents: worktree`:
+
+1. **Agent spawns**: Creates `.worktrees/implementer-<id>/` with separate branch
+2. **Isolated work**: All file changes happen in worktree directory
+3. **On completion**: Branch merges back to main automatically
+4. **Cleanup**: Worktree and branch removed after merge
+
+**Benefits:**
+- ✅ No git conflicts during parallel execution
+- ✅ Each agent has independent workspace
+- ✅ Clean merge history with `--no-ff`
+- ✅ Automatic cleanup on success
+
+**Example:**
+```bash
+> /conductor:agents
+
+Background Agents:
+  [RUNNING] implementer - worktree: .worktrees/implementer-1735075200
+
+# Agent completes...
+
+> /conductor:agents results
+
+Implementer completed. Merging worktree...
+✓ Merged conductor/implementer-1735075200 → main
+✓ Removed worktree
+```
+
+### Skills Auto-Loading
+
+Agents now preload skills at startup for faster context loading:
+
+| Agent | Preloaded Skills |
+|-------|-----------------|
+| **planner** | context-awareness |
+| **implementer** | context-awareness, tdd-workflow, code-styleguides |
+| **reviewer** | context-awareness |
+
+This ensures agents have immediate access to:
+- Project context (product.md, tech-stack.md, workflow.md)
+- TDD methodology (Red-Green-Refactor cycle)
+- Language-specific style guidelines
 
 ## Project Structure
 
@@ -364,9 +480,10 @@ Conductor uses Claude Code's plugin system:
 | Component | Purpose |
 |-----------|---------|
 | **Commands** (`/conductor:*`) | User-invoked actions |
-| **Agents** | Specialized subagents (planner, implementer, reviewer) |
-| **Skills** | Auto-discovered capabilities (TDD, styleguides, context) |
+| **Agents** | Specialized subagents with preloaded skills (planner, implementer, reviewer) |
+| **Skills** | Auto-loaded capabilities via frontmatter (TDD, styleguides, context) |
 | **Hooks** | Event-driven automation (context loading, change tracking) |
+| **Worktrees** | Git isolation for parallel agent execution |
 
 ## Documentation
 

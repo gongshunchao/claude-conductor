@@ -3,6 +3,7 @@ name: implementer
 description: Specialist for executing implementation tasks following TDD workflow. Use when implementing features, fixing bugs, or working through plan.md tasks.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: claude-sonnet-4-5-20250929
+skills: context-awareness, tdd-workflow, code-styleguides
 ---
 
 # Conductor Implementation Agent

@@ -170,7 +170,65 @@ The implementer agent will:
 - Update plan.md with progress
 - Report completion or blockers
 
+### Background Execution Option
+
+For long-running tasks or parallel workflows, run the implementer in background:
+
+**When to use:**
+- User explicitly requests it ("run in background", "work on this while I...")
+- Task is estimated to take significant time
+- User wants to work on unrelated tasks in parallel
+
+**Worktree isolation (if `parallel_agents: worktree` in workflow.md):**
+
+1. **Before spawning agent**, create isolated worktree:
+   ```bash
+   TASK_ID="task_$(date +%s)"
+   git worktree add .worktrees/implementer-$TASK_ID -b conductor/implementer-$TASK_ID
+   ```
+
+2. **Spawn agent with worktree path**:
+   ```
+   Task tool:
+   - subagent_type: 'implementer'
+   - run_in_background: true
+   - prompt: |
+       WORKING DIRECTORY: .worktrees/implementer-<task_id>
+
+       Execute task: <task description>
+
+       Track ID: <track_id>
+       Context files (relative to worktree):
+       - conductor/tracks/<track_id>/spec.md
+       - conductor/tracks/<track_id>/plan.md
+       ...
+   ```
+
+3. **Announce**: "Running implementer in background (worktree: `.worktrees/implementer-<task_id>`). Task: '<description>'"
+
+4. **On completion** (use TaskOutput to retrieve):
+   ```bash
+   # Switch to worktree to get changes
+   cd .worktrees/implementer-$TASK_ID
+
+   # Merge branch back
+   git checkout main
+   git merge --no-ff conductor/implementer-$TASK_ID -m "conductor(merge): Complete background task '<description>'"
+
+   # Cleanup worktree
+   git worktree remove .worktrees/implementer-$TASK_ID
+   git branch -d conductor/implementer-$TASK_ID
+   ```
+
+**Important:**
+- If `parallel_agents: sequential`, queue background agents instead of running in parallel
+- If `parallel_agents: unsafe`, skip worktree creation (not recommended)
+- DO NOT use background for dependent tasks within a phase
+- Always verify background completion before phase verification
+
 ### Phase Completion Check
+
+**CRITICAL**: If implementer was running in background, use TaskOutput to retrieve results before phase verification.
 
 When all tasks in a phase are complete, delegate to reviewer agent:
 
