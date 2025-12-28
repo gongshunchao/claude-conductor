@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2024-12-27
+
+### Added
+- Agents and commands now inherit model from parent context when not explicitly set
+
+### Fixed
+- Prevent CPU spikes from unbounded parallel file operations in hooks
+- Optimize stdin reading in all hook scripts (array collection vs string concatenation)
+- Add orphan worktree detection warning on session start
+- Document resource limits for concurrent background agents
+
 ## [1.0.1] - 2024-12-24
 
 ### Fixed
