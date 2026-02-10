@@ -1,6 +1,7 @@
 ---
 name: tdd-workflow
 description: Test-Driven Development guidance. Use when writing code, implementing features, or fixing bugs in projects that follow TDD methodology. Provides the Red-Green-Refactor cycle structure.
+allowed-tools: Read, Bash
 ---
 
 # TDD Workflow Skill
@@ -65,10 +66,14 @@ Guidance for Test-Driven Development methodology.
 
 | Language | Command |
 |----------|---------|
-| JS/TS (Jest) | `npx jest --coverage` |
-| JS/TS (Vitest) | `npx vitest run --coverage` |
+| JS/TS (Jest) | `CI=true npx jest --coverage` |
+| JS/TS (Vitest) | `CI=true npx vitest run --coverage` |
 | Python | `pytest --cov=src --cov-report=html` |
 | Go | `go test -cover ./...` |
+| C# | `dotnet test --collect:"XPlat Code Coverage"` |
+| Dart | `dart test --coverage` |
+
+> **Tip:** Use `CI=true` prefix for JS/TS test runners to prevent watch mode and ensure single execution.
 
 ## Anti-Patterns to Avoid
 
