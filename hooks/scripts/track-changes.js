@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PostToolUse hook - Track plan.md modifications
+// PostToolUse hook - Track plan.md modifications per track
 
 const fs = require('fs').promises;
 const path = require('path');
@@ -17,10 +17,15 @@ async function main() {
 
   // Only track conductor plan.md changes
   if (filePath.includes('conductor') && filePath.includes('plan.md')) {
-    const timestamp = new Date().toISOString();
-    const logFile = path.join(cwd, 'conductor', '.conductor_session_log');
-    await fs.appendFile(logFile, `${timestamp}: Modified ${filePath}\n`);
+    // Extract track directory from path (e.g. conductor/tracks/auth-feature/plan.md)
+    const match = filePath.match(/conductor\/tracks\/([^/]+)\//);
+    if (match) {
+      const trackDir = path.join(cwd, 'conductor', 'tracks', match[1]);
+      const logFile = path.join(trackDir, '.session_log');
+      const timestamp = new Date().toISOString();
+      await fs.appendFile(logFile, `${timestamp}: Modified plan.md\n`);
+    }
   }
 }
 
-main().catch(() => process.exit(1));
+main().catch(() => process.exit(0));
