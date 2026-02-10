@@ -271,7 +271,92 @@ The reviewer agent will:
 
 When all phases complete:
 
-1. Update `tracks.md`: `[~]` → `[x]`
-2. Review if `product.md` or `tech-stack.md` need updates (propose, await approval)
-3. Use AskUserQuestion: Archive to conductor/archive / Delete / Leave as-is
-4. Announce: "Track complete! Run `/conductor:status` for overall progress."
+### 1. Update Track Status
+
+Update `tracks.md`: `[~]` → `[x]`
+
+```bash
+git add conductor/tracks.md
+git commit -m "conductor(track): Complete track '<description>'"
+```
+
+### 2. Synchronize Project Documentation
+
+Check if project context files need updates based on the completed work:
+
+**Read these files in parallel:**
+- `conductor/product.md`
+- `conductor/tech-stack.md`
+- `conductor/tracks/<track_id>/spec.md`
+
+**For each file, evaluate:**
+
+| File | Update If... |
+|------|-------------|
+| `product.md` | New user-facing features were added, product description changed |
+| `tech-stack.md` | New dependencies, frameworks, or tools were introduced |
+| `product-guidelines.md` | New UI patterns, design standards, or conventions emerged |
+
+**If updates needed:**
+1. Propose specific changes to the user (show diff preview)
+2. Await approval before editing
+3. Commit all doc changes together:
+   ```bash
+   git add conductor/product.md conductor/tech-stack.md conductor/product-guidelines.md
+   git commit -m "docs(conductor): Synchronize docs for track '<description>'"
+   ```
+
+**If no updates needed:**
+- Announce: "Project documentation is up to date. No changes needed."
+
+### 3. Track Cleanup
+
+Use AskUserQuestion:
+
+```
+Track '<description>' is now complete! What would you like to do?
+
+A) Review (Recommended): Run /conductor:review to verify changes before finalizing
+B) Archive: Move to conductor/archive/ and update tracks registry
+C) Delete: Permanently remove track folder and registry entry
+D) Skip: Leave track as-is in the tracks file
+```
+
+**If "A" (Review):**
+- Announce: "Please run `/conductor:review` to verify your changes. You can archive or delete the track after the review."
+- **STOP**
+
+**If "B" (Archive):**
+1. Create archive directory:
+   ```bash
+   mkdir -p conductor/archive
+   ```
+2. Move track folder:
+   ```bash
+   mv conductor/tracks/<track_id> conductor/archive/<track_id>
+   ```
+3. Update `conductor/tracks.md`: Remove the completed track section
+4. Commit:
+   ```bash
+   git add conductor/
+   git commit -m "conductor(track): Archive completed track '<description>'"
+   ```
+
+**If "C" (Delete):**
+1. Remove track folder:
+   ```bash
+   rm -rf conductor/tracks/<track_id>
+   ```
+2. Update `conductor/tracks.md`: Remove the completed track section
+3. Commit:
+   ```bash
+   git add conductor/
+   git commit -m "conductor(track): Delete completed track '<description>'"
+   ```
+
+**If "D" (Skip):**
+- Announce: "Track left as-is. You can archive or delete later with `/conductor:review`."
+
+### 4. Announce Completion
+
+"🎉 Track '<description>' complete! Run `/conductor:status` for overall progress or `/conductor:new-track` to start the next feature."

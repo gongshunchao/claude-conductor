@@ -33,7 +33,7 @@ claude --plugin-dir /path/to/conductor
 /conductor:
 ```
 
-You should see the 5 conductor commands listed.
+You should see the 7 conductor commands listed.
 
 ### Production (via GitHub Marketplace)
 
@@ -296,6 +296,51 @@ Commits to revert (newest first):
 Do you want to proceed? [Y/n]
 ```
 
+---
+
+### `/conductor:review`
+
+Review completed work against guidelines, styleguides, and the plan.
+
+**Usage:**
+```
+/conductor:review [<track-name>]
+```
+
+**Arguments:**
+- `<track-name>` - Name of track to review (optional, will prompt if not provided)
+
+**What it does:**
+1. Loads product guidelines, code styleguides, and track context
+2. Extracts all commits associated with the track
+3. Reviews code against styleguides (High severity), spec compliance, and security
+4. Generates a severity-rated findings report
+5. Offers to auto-apply fixes or pause for manual resolution
+6. Provides track cleanup options (archive/delete/skip)
+
+**Example:**
+```
+> /conductor:review user-auth
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CONDUCTOR REVIEW REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Track: User Authentication
+  Files Reviewed: 12
+  Commits Analyzed: 8
+
+🟠 HIGH (2)
+  1. [Styleguide] Missing error handling in auth middleware
+  2. [Spec] Rate limiting not implemented per spec
+
+🟡 MEDIUM (1)
+  1. [Guidelines] Login button text doesn't match brand voice
+
+What would you like to do?
+A) Apply Fixes  B) Manual Fix  C) Accept & Continue
+```
+
 ## Configuration
 
 ### Workflow Customization
@@ -330,6 +375,8 @@ Language-specific style guides are provided in `templates/code-styleguides/`:
 - Go
 - JavaScript
 - HTML/CSS
+- C#
+- General (universal standards)
 
 During `/conductor:setup`, selected styleguides are copied to `conductor/code_styleguides/` based on your tech stack. The `code-styleguides` skill auto-activates when writing code, reading from your project's styleguide files.
 

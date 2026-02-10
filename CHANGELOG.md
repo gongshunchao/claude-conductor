@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-10
+
+### Added
+- `/conductor:review` command — Code review against product guidelines, code styleguides, and spec compliance with severity-rated findings report, auto-fix option, and track cleanup (archive/delete/skip)
+- C# code styleguide template (`templates/code-styleguides/csharp.md`) — Covers naming, formatting, records, nullable refs, pattern matching, async, DI, and testing
+- General code styleguide template (`templates/code-styleguides/general.md`) — Universal standards for naming, file organization, functions, error handling, security, testing, and git commits
+
+### Changed
+- Enhanced Track Completion in `/conductor:implement` with document synchronization step (auto-detect and propose updates to product.md, tech-stack.md, product-guidelines.md)
+- Enhanced Track Completion with 4-option cleanup: Review (recommended) / Archive / Delete / Skip
+- Updated code-styleguides skill to include C# (`.cs`, `.csx`) and General language support
+- Bumped version to 1.3.0
+
 ## [1.2.0] - 2025-12-29
 
 ### Changed
