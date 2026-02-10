@@ -1,6 +1,6 @@
 ---
 name: code-styleguides
-description: Language-specific code style guidelines. Use when writing TypeScript, Python, Go, JavaScript, HTML/CSS, or C# code to ensure consistent, idiomatic, and maintainable code following best practices.
+description: Language-specific code style guidelines. Use when writing TypeScript, Python, Go, JavaScript, HTML/CSS, C#, C++, or Dart code to ensure consistent, idiomatic, and maintainable code following best practices.
 allowed-tools: Read, Glob
 ---
 
@@ -22,6 +22,8 @@ Reads project-level styleguides from `conductor/code_styleguides/` (copied durin
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | `conductor/code_styleguides/javascript.md` |
 | HTML/CSS | `.html`, `.css`, `.scss`, `.sass` | `conductor/code_styleguides/html-css.md` |
 | C# | `.cs`, `.csx` | `conductor/code_styleguides/csharp.md` |
+| C++ | `.cpp`, `.cc`, `.cxx`, `.h`, `.hpp` | `conductor/code_styleguides/cpp.md` |
+| Dart | `.dart` | `conductor/code_styleguides/dart.md` |
 | General | (all languages) | `conductor/code_styleguides/general.md` |
 
 ## When to Activate
@@ -43,7 +45,7 @@ Writing new code, reviewing code, refactoring, or setting up new files/modules.
 | Setting | Recommendation |
 |---------|----------------|
 | Line length | 80-120 characters |
-| Indentation | 2 spaces (JS/TS), 4 spaces (Python/C#), tabs (Go) |
+| Indentation | 2 spaces (JS/TS/C++), 4 spaces (Python/C#/Dart), tabs (Go) |
 | Naming | Follow language conventions |
 | Imports | Organized and grouped |
 | Comments | Minimal, meaningful |

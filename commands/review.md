@@ -74,7 +74,7 @@ ls conductor/code_styleguides/ 2>/dev/null
 - `conductor/tracks/<track_id>/plan.md` — Implementation plan with commit SHAs
 - `conductor/tracks/<track_id>/spec.md` — Original requirements
 
-## Extract Changes for Review
+## Extract Changes for Review (Smart Chunking)
 
 ### If reviewing a track
 
@@ -83,28 +83,53 @@ ls conductor/code_styleguides/ 2>/dev/null
    grep -oP '\[[a-f0-9]{7,}\]' conductor/tracks/<track_id>/plan.md | tr -d '[]' | sort -u
    ```
 
-2. **Get changed files across all track commits**:
+2. **Determine revision range**:
    ```bash
    # Find the earliest track commit
    FIRST_SHA=$(grep -oP '\[[a-f0-9]{7,}\]' conductor/tracks/<track_id>/plan.md | tr -d '[]' | head -1)
-   git diff --name-only ${FIRST_SHA}^..HEAD -- ':!conductor/'
+   LAST_SHA=$(grep -oP '\[[a-f0-9]{7,}\]' conductor/tracks/<track_id>/plan.md | tr -d '[]' | tail -1)
    ```
 
-3. **Get full diff for review**:
+3. **Volume Check — Smart Chunking Strategy**:
    ```bash
-   git diff ${FIRST_SHA}^..HEAD -- ':!conductor/' ':!*.md'
+   git diff --shortstat ${FIRST_SHA}^..HEAD -- ':!conductor/'
    ```
+
+   **Strategy Selection:**
+   - **Small/Medium Changes (< 300 lines):**
+     - Run `git diff ${FIRST_SHA}^..HEAD -- ':!conductor/' ':!*.md'` for full context in one go.
+     - Proceed to "Review Protocol".
+   - **Large Changes (> 300 lines):**
+     - Announce: "Using Iterative Review Mode due to change size."
+     - List files: `git diff --name-only ${FIRST_SHA}^..HEAD -- ':!conductor/'`
+     - **Iterate:** For each source file (ignore lock files, assets, generated files):
+       1. Run `git diff ${FIRST_SHA}^..HEAD -- <file_path>`
+       2. Perform review checks on this specific chunk
+       3. Store findings in memory
+     - **Aggregate:** Synthesize all file-level findings into the final report.
 
 ### If reviewing current uncommitted changes
 
 ```bash
+git diff --shortstat HEAD
 git diff --name-only HEAD
 git diff HEAD
 ```
 
 ## Review Protocol
 
-### 1. Code Styleguide Compliance (High Severity)
+**Persona:** You are a **Principal Software Engineer** and **Code Review Architect**. You think from first principles, are meticulous and detail-oriented, and prioritize correctness, maintainability, and security over minor stylistic nits (unless they violate strict style guides).
+
+### 1. Intent Verification (High Severity)
+
+Compare implementation against `spec.md` and `plan.md`:
+- Does the code actually implement what the plan asked for?
+- All requirements addressed
+- Edge cases handled
+- Acceptance criteria met
+- No scope creep (unplanned additions)
+
+### 2. Code Styleguide Compliance (High Severity)
 
 For each changed code file, verify against the matching styleguide:
 
@@ -116,6 +141,8 @@ For each changed code file, verify against the matching styleguide:
 | `.js`, `.jsx` | `conductor/code_styleguides/javascript.md` |
 | `.html`, `.css`, `.scss` | `conductor/code_styleguides/html-css.md` |
 | `.cs` | `conductor/code_styleguides/csharp.md` |
+| `.cpp`, `.cc`, `.h`, `.hpp` | `conductor/code_styleguides/cpp.md` |
+| `.dart` | `conductor/code_styleguides/dart.md` |
 
 Check for:
 - Naming conventions
@@ -125,7 +152,7 @@ Check for:
 - Documentation standards
 - Language-specific idioms
 
-### 2. Product Guidelines Compliance (Medium Severity)
+### 3. Product Guidelines Compliance (Medium Severity)
 
 If `product-guidelines.md` exists, verify:
 - UI/UX follows brand guidelines
@@ -133,23 +160,33 @@ If `product-guidelines.md` exists, verify:
 - User-facing text follows voice/tone guidelines
 - Accessibility requirements met
 
-### 3. Spec Compliance (High Severity)
+### 4. Correctness & Safety (High Severity)
 
-Compare implementation against `spec.md`:
-- All requirements addressed
-- Edge cases handled
-- Acceptance criteria met
-- No scope creep (unplanned additions)
+Check for:
+- Bugs, race conditions, null pointer risks
+- Unsafe input handling
+- Resource leaks (unclosed connections, file handles)
 
-### 4. Quality Gate Verification (High Severity)
+### 5. Quality Gate Verification (High Severity)
 
 Based on `workflow.md` requirements:
 
-```bash
-# Run tests
-CI=true npm test 2>&1 || CI=true npx jest 2>&1 || go test ./... 2>&1 || python -m pytest 2>&1
+**Action: Execute the test suite automatically.** Infer the test command based on the codebase languages and structure. Announce the command before running:
 
-# Check coverage (if configured)
+> "I will now run the automated test suite. **Command:** `CI=true npm test`"
+
+```bash
+# Auto-detect and run tests
+CI=true npm test 2>&1 || CI=true npx jest 2>&1 || go test ./... 2>&1 || python -m pytest 2>&1 || dotnet test 2>&1 || dart test 2>&1
+```
+
+If tests fail:
+- Inform the user and begin debugging
+- Attempt a fix **maximum of two times**
+- If still failing after second attempt, **STOP** and ask user for guidance
+
+Check coverage (if configured):
+```bash
 CI=true npm test -- --coverage 2>&1 || true
 ```
 
@@ -159,7 +196,7 @@ Verify:
 - No linting errors
 - Type safety enforced (if applicable)
 
-### 5. Security Quick Scan (Critical Severity)
+### 6. Security Quick Scan (Critical Severity)
 
 Check for common issues:
 - Hardcoded secrets or API keys
@@ -187,6 +224,14 @@ Present findings organized by severity:
   Track: <description>
   Files Reviewed: <count>
   Commits Analyzed: <count>
+
+VERIFICATION CHECKS
+───────────────────────────────────────────────────
+  - [ ] Plan Compliance: [Yes/No/Partial] - <comment>
+  - [ ] Style Compliance: [Pass/Fail]
+  - [ ] New Tests: [Yes/No]
+  - [ ] Test Coverage: [Yes/No/Partial]
+  - [ ] Test Results: [Passed/Failed] - <summary>
 
 FINDINGS
 ───────────────────────────────────────────────────

@@ -1,17 +1,23 @@
 ---
 description: Manage background Conductor agents and worktrees
 argument-hint: [status|results|worktrees|cleanup]
-allowed-tools: Read, Bash, Glob
-model: claude-haiku-4-5-20251001
+allowed-tools: Read, Bash, Glob, Grep, AskUserQuestion
+model: inherit
 ---
 
 # Conductor Agents
 
 Monitor and manage background Conductor agents and git worktrees.
 
-## Commands
+## 1.0 System Directive
 
-### Default (no arguments): Check Background Agent Status
+You are an AI agent managing background Conductor agents and their git worktree isolation. Your goal is to provide clear status information, retrieve results from completed agents, and safely clean up orphaned worktrees.
+
+**CRITICAL:** You must validate the success of every tool call. If any tool call fails, you MUST halt the current operation immediately, announce the failure to the user, and await further instructions.
+
+---
+
+## 2.0 Default (no arguments): Check Background Agent Status
 
 **Run in parallel (single response with multiple Bash calls):**
 
@@ -26,21 +32,27 @@ Monitor and manage background Conductor agents and git worktrees.
    git worktree list
    ```
 
-**Status Report Format:**
+### Status Report
 
-For each background agent, display:
-- Agent type (implementer/planner/reviewer)
-- Task ID or description
-- Status (running/completed/failed)
-- Worktree path (if using worktree isolation)
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CONDUCTOR AGENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**If no background agents:** "No background agents currently running."
+  Background Agents:
+    [RUNNING]   implementer - Task: Add user validation
+    [COMPLETED] planner     - Track: dashboard_20260210
 
-**If worktrees exist but no agents:** Suggest `/conductor:agents cleanup` to remove orphaned worktrees.
+  Worktrees:
+    .worktrees/implementer-1735075200 → conductor/implementer-1735075200
+```
+
+- **If no background agents:** "No background agents currently running."
+- **If worktrees exist but no agents:** Suggest `/conductor:agents cleanup` to remove orphaned worktrees.
 
 ---
 
-### `/conductor:agents results` - Retrieve Results
+## 3.0 `/conductor:agents results` — Retrieve Results
 
 Use TaskOutput to retrieve results from completed background agents.
 
@@ -60,12 +72,15 @@ Use TaskOutput to retrieve results from completed background agents.
 
 3. **Worktree merge** (if applicable):
    - Check if agent used worktree isolation
-   - Merge worktree branch back to main
-   - Cleanup worktree (see cleanup section)
+   - Merge worktree branch back to main:
+     ```bash
+     git merge --no-ff conductor/<agent>-<id> -m "conductor(merge): Merge <agent> worktree"
+     ```
+   - Cleanup worktree after merge (see Section 5.0)
 
 ---
 
-### `/conductor:agents worktrees` - List Worktrees
+## 4.0 `/conductor:agents worktrees` — List Worktrees
 
 Display detailed worktree information:
 
@@ -94,25 +109,23 @@ git branch -d conductor/<agent>-<id>
 
 ---
 
-### `/conductor:agents cleanup` - Clean Orphaned Worktrees
+## 5.0 `/conductor:agents cleanup` — Clean Orphaned Worktrees
 
 Remove worktrees that no longer have running agents.
 
-**Safety protocol:**
+### Safety Protocol
 
 1. **List all worktrees**:
    ```bash
    git worktree list
    ```
 
-2. **Check for running agents**:
-   - Compare worktrees against active background tasks
-   - Identify orphaned worktrees (no associated running agent)
+2. **Check for running agents**: Compare worktrees against active background tasks. Identify orphaned worktrees (no associated running agent).
 
 3. **For each orphaned worktree**, ask user:
-   - "Worktree `.worktrees/<agent>-<id>` has no running agent. Merge and cleanup? (yes/no)"
+   > "Worktree `.worktrees/<agent>-<id>` has no running agent. Merge and cleanup? (Yes/No)"
 
-4. **If yes**:
+4. **If Yes**:
    ```bash
    # Check for uncommitted changes
    cd .worktrees/<agent>-<id>
@@ -121,24 +134,22 @@ Remove worktrees that no longer have running agents.
      # Ask user to confirm or abort
    fi
 
-   # Merge branch
-   git checkout main
+   # Return to main and merge
+   cd -
    git merge --no-ff conductor/<agent>-<id> -m "conductor(cleanup): Merge orphaned worktree <agent>-<id>"
 
-   # Remove worktree
+   # Remove worktree and branch
    git worktree remove .worktrees/<agent>-<id>
-
-   # Delete branch
    git branch -d conductor/<agent>-<id>
    ```
 
-5. **If no**: Skip that worktree
+5. **If No**: Skip that worktree.
 
 6. **Report**: "Cleaned up N worktrees."
 
 ---
 
-## Integration with /implement
+## 6.0 Integration with /implement
 
 After retrieving background implementer results:
 
@@ -151,9 +162,9 @@ After retrieving background implementer results:
 
 ---
 
-## Safety Notes
+## 7.0 Safety Notes
 
 - Always check for uncommitted changes before removing worktrees
 - Use `--no-ff` merge to preserve branch history for audit trail
 - Confirm with user before destructive operations
-- Background agents may fail - always check status before cleanup
+- Background agents may fail — always check status before cleanup

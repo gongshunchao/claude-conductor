@@ -45,6 +45,12 @@ All tasks follow a strict lifecycle:
 
    # Go
    go test -cover ./...
+
+   # C#
+   dotnet test --collect:"XPlat Code Coverage"
+
+   # Dart
+   dart test --coverage
    ```
    Target: >80% coverage for new code. The specific tools and commands will vary by language and framework.
 
@@ -157,6 +163,100 @@ Before marking any task complete, verify:
 - [ ] Documentation updated if needed
 - [ ] No security vulnerabilities introduced
 
+## Development Commands
+
+**AI AGENT INSTRUCTION: This section should be adapted to the project's specific language, framework, and build tools during `/conductor:setup`.**
+
+### Setup
+```bash
+# Example: Commands to set up the development environment
+# Node.js: npm install
+# Python:  pip install -r requirements.txt
+# Go:      go mod tidy
+# C#:      dotnet restore
+# Dart:    dart pub get
+```
+
+### Daily Development
+```bash
+# Example: Commands for common daily tasks
+# Node.js: npm run dev / npm test / npm run lint
+# Python:  python manage.py runserver / pytest / ruff check .
+# Go:      go run main.go / go test ./... / golangci-lint run
+# C#:      dotnet run / dotnet test / dotnet format
+# Dart:    dart run / dart test / dart analyze
+```
+
+### Before Committing
+```bash
+# Example: Commands to run all pre-commit checks
+# Node.js: npm run check (format + lint + type-check + test)
+# Python:  ruff check . && mypy . && pytest
+# Go:      go fmt ./... && go vet ./... && go test ./...
+# C#:      dotnet format && dotnet test
+# Dart:    dart format . && dart analyze && dart test
+```
+
+## Testing Requirements
+
+### Unit Testing
+- Every module must have corresponding tests.
+- Use appropriate test setup/teardown mechanisms (e.g., fixtures, beforeEach/afterEach).
+- Mock external dependencies.
+- Test both success and failure cases.
+
+### Integration Testing
+- Test complete user flows
+- Verify database transactions
+- Test authentication and authorization
+- Check form submissions and API endpoints
+
+### Mobile Testing (if applicable)
+- Test on actual devices when possible
+- Use browser developer tools for responsive testing
+- Test touch interactions
+- Verify responsive layouts
+- Check performance on 3G/4G networks
+
+## Code Review Process
+
+### Self-Review Checklist
+
+Before requesting review:
+
+1. **Functionality**
+   - Feature works as specified
+   - Edge cases handled
+   - Error messages are user-friendly
+
+2. **Code Quality**
+   - Follows style guide
+   - DRY principle applied
+   - Clear variable/function names
+   - Appropriate comments
+
+3. **Testing**
+   - Unit tests comprehensive
+   - Integration tests pass
+   - Coverage adequate (>80%)
+
+4. **Security**
+   - No hardcoded secrets
+   - Input validation present
+   - SQL injection prevented
+   - XSS protection in place
+
+5. **Performance**
+   - Database queries optimized
+   - Assets optimized
+   - Caching implemented where needed
+
+6. **Mobile Experience** (if applicable)
+   - Touch targets adequate (44x44px)
+   - Text readable without zooming
+   - Performance acceptable on mobile
+   - Interactions feel native
+
 ## Commit Guidelines
 
 ### Message Format
@@ -176,13 +276,15 @@ Before marking any task complete, verify:
 - `refactor`: Code change that neither fixes a bug nor adds a feature
 - `test`: Adding missing tests
 - `chore`: Maintenance tasks
+- `perf`: Performance improvement
+- `ci`: CI/CD changes
 
 ### Examples
 ```bash
 git commit -m "feat(auth): Add remember me functionality"
 git commit -m "fix(posts): Correct excerpt generation for short posts"
 git commit -m "test(comments): Add tests for emoji reaction limits"
-git commit -m "style(mobile): Improve button touch targets"
+git commit -m "refactor(api): Extract validation middleware"
 ```
 
 ## Definition of Done
@@ -198,6 +300,64 @@ A task is complete when:
 7. Implementation notes added to `plan.md`
 8. Changes committed with proper message
 9. Git note with task summary attached to the commit
+
+## Emergency Procedures
+
+### Critical Bug in Production
+1. Create hotfix branch from main
+2. Write failing test for bug
+3. Implement minimal fix
+4. Test thoroughly including mobile
+5. Deploy immediately
+6. Document in plan.md
+
+### Data Loss
+1. Stop all write operations
+2. Restore from latest backup
+3. Verify data integrity
+4. Document incident
+5. Update backup procedures
+
+### Security Breach
+1. Rotate all secrets immediately
+2. Review access logs
+3. Patch vulnerability
+4. Notify affected users (if any)
+5. Document and update security procedures
+
+## Deployment Workflow
+
+### Pre-Deployment Checklist
+- [ ] All tests passing
+- [ ] Coverage >80%
+- [ ] No linting errors
+- [ ] Mobile testing complete (if applicable)
+- [ ] Environment variables configured
+- [ ] Database migrations ready
+- [ ] Backup created
+
+### Deployment Steps
+1. Merge feature branch to main
+2. Tag release with version
+3. Push to deployment service
+4. Run database migrations
+5. Verify deployment
+6. Test critical paths
+7. Monitor for errors
+
+### Post-Deployment
+1. Monitor analytics
+2. Check error logs
+3. Gather user feedback
+4. Plan next iteration
+
+## Continuous Improvement
+
+- Review workflow weekly
+- Update based on pain points
+- Document lessons learned
+- Optimize for user happiness
+- Keep things simple and maintainable
 
 ## Customization
 

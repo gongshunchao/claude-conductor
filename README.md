@@ -2,7 +2,7 @@
 
 **English** | [中文](README_CN.md)
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 
@@ -405,6 +405,8 @@ Language-specific style guides are provided in `templates/code-styleguides/`:
 - JavaScript
 - HTML/CSS
 - C#
+- C++
+- Dart
 - General (universal standards)
 
 During `/conductor:setup`, selected styleguides are copied to `conductor/code_styleguides/` based on your tech stack. The `code-styleguides` skill auto-activates when writing code, reading from your project's styleguide files.
@@ -503,7 +505,7 @@ claude-conductor/
 │   ├── hooks.json            # Hook event configuration
 │   └── scripts/              # Hook scripts (context loading, tracking)
 ├── templates/
-│   └── code-styleguides/     # Styleguide templates (TS, Python, Go, JS, CSS, C#, General)
+│   └── code-styleguides/     # Styleguide templates (TS, Python, Go, JS, CSS, C#, C++, Dart, General)
 ├── reference/                # Detailed architecture documentation
 ├── CHANGELOG.md
 ├── LICENSE

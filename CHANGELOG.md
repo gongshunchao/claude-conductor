@@ -7,6 +7,63 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-10
+
+### Added
+- C++ code styleguide template (`templates/code-styleguides/cpp.md`) — Google C++ Style Guide summary
+- Dart code styleguide template (`templates/code-styleguides/dart.md`) — Effective Dart conventions
+- Development Commands section in workflow template (Setup, Daily Development, Before Committing)
+- Testing Requirements section in workflow template (Unit, Integration, Mobile)
+- Code Review Process section in workflow template (Self-Review Checklist with 6 categories)
+- Emergency Procedures section in workflow template (Critical Bug, Data Loss, Security Breach)
+- Deployment Workflow section in workflow template (Pre-Deployment, Steps, Post-Deployment)
+- Continuous Improvement section in workflow template
+- `conductor/index.md` generation during setup (project context index file)
+- Smart Chunking in `/conductor:review` — iterative review for large diffs (>300 lines)
+- Auto test suite execution in `/conductor:review` with proactive debugging
+- Verification Checks table in review report output
+- Ghost commit handling in `/conductor:revert` (rewritten history detection)
+- Hierarchical selection menu in `/conductor:revert` grouped by track
+- Merge commit and cherry-pick detection in `/conductor:revert`
+- Date/time display in `/conductor:status` report
+- Project status classification (On Track / Behind Schedule / Blocked / Complete)
+
+### Changed
+- **`commands/setup.md`** — Complete rewrite with Gemini Conductor parity:
+  - Added welcome overview and step-by-step guided flow
+  - Added interactive Q&A protocol with question classification (Additive vs Exclusive Choice)
+  - Added max 5 questions per section with auto-generate option (Option E)
+  - Added user confirmation loops for each generated document
+  - Enhanced brownfield analysis with .gitignore respect, file size triage, large file handling
+  - Added code styleguide selection with tech-stack-based recommendations
+  - Added workflow customization (coverage target, commit strategy, git notes)
+  - Added Phase Completion Task injection in plan generation
+  - Added track index.md and metadata.json creation
+- **`commands/new-track.md`** — Enhanced with interactive spec/plan generation:
+  - Added sequential Q&A for spec.md (3-5 questions for features, 2-3 for bugs)
+  - Added spec.md sections: Overview, Functional/Non-Functional Requirements, Acceptance Criteria, Out of Scope
+  - Added user confirmation loops for both spec.md and plan.md
+  - Added duplicate track name detection
+  - Added Phase Completion Task injection in plan generation
+  - Added track index.md creation
+- **`commands/review.md`** — Enhanced review protocol:
+  - Added Principal Software Engineer persona
+  - Added Intent Verification and Correctness & Safety dimensions
+  - Added C++ and Dart to file extension mapping
+  - Added smart chunking strategy for large diffs
+  - Added auto test execution with 2-attempt debugging limit
+- **`commands/revert.md`** — Complete rewrite with advanced git handling:
+  - Added hierarchical selection menu grouped by track
+  - Added ghost commit detection for rewritten history
+  - Added plan-update commit identification
+  - Added track creation commit identification for track reverts
+  - Added merge commit and cherry-pick detection
+  - Added formatted revert plan and completion reports
+- **`commands/status.md`** — Enhanced with date display, project status classification, formatted report
+- **`templates/workflow.md`** — Added 6 missing sections from Gemini Conductor, C#/Dart coverage examples, perf/ci commit types
+- Updated code-styleguides skill to include C++ and Dart
+- Bumped version to 1.4.0
+
 ## [1.3.0] - 2026-02-10
 
 ### Added
