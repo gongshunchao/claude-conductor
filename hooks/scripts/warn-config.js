@@ -14,13 +14,16 @@ async function main() {
   const filePath = data.tool_input?.file_path || '';
 
   // Check if modifying core conductor config
-  const configPattern = /conductor\/(product|tech-stack|workflow)\.md$/;
+  const configPattern = /conductor\/(product|tech-stack|workflow|product-guidelines)\.md$/;
   if (configPattern.test(filePath)) {
     const configName = path.basename(filePath);
     console.log(JSON.stringify({
-      systemMessage: `Modifying core conductor config: ${configName}`
+      hookSpecificOutput: {
+        permissionDecision: 'ask'
+      },
+      systemMessage: `⚠️ Modifying core conductor config: ${configName}. This file affects the entire project. Proceed with caution.`
     }));
   }
 }
 
-main().catch(() => process.exit(1));
+main().catch(() => process.exit(0));

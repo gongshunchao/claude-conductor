@@ -18,16 +18,25 @@ async function main() {
   // Try to read tracks file (TOCTOU fix)
   const content = await fs.readFile(tracksFile, 'utf8').catch(() => null);
   if (!content) {
+    // No conductor project, approve stop silently
+    console.log(JSON.stringify({ decision: 'approve' }));
     process.exit(0);
   }
 
   const inProgress = (content.match(/\[in-progress\]/g) || []).length;
 
   if (inProgress > 0) {
-    console.error('');
-    console.error(`Conductor: ${inProgress} track(s) still in progress.`);
-    console.error('Run /conductor:status to see details.');
+    // Approve stop but remind about in-progress tracks
+    console.log(JSON.stringify({
+      decision: 'approve',
+      systemMessage: `Conductor: ${inProgress} track(s) still in progress. Run /conductor:status to see details.`
+    }));
+  } else {
+    console.log(JSON.stringify({ decision: 'approve' }));
   }
 }
 
-main().catch(() => process.exit(1));
+main().catch(() => {
+  console.log(JSON.stringify({ decision: 'approve' }));
+  process.exit(0);
+});

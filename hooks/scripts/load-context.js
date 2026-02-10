@@ -139,12 +139,9 @@ async function main() {
 
   context += `\nRun \`/conductor:implement\` to continue.`;
 
-  // Output JSON with context
+  // Output JSON with systemMessage (standard hook output format)
   console.log(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: context
-    }
+    systemMessage: context
   }));
 }
 
