@@ -1,0 +1,16 @@
+{
+  "name": "code-styleguides",
+  "version": "1.0.0",
+  "description": "Language-specific coding standards for TypeScript, Python, Go, Java, C#, C++, Dart, and more",
+  "activation": {
+    "keywords": ["style", "convention", "naming", "format", "lint", "standard"],
+    "file_patterns": ["**/*.ts", "**/*.py", "**/*.go", "**/*.java", "**/*.cs", "**/*.cpp", "**/*.dart"],
+    "tech_stack": {
+      "languages": ["TypeScript", "Python", "Go", "Java", "JavaScript", "C#", "C++", "Dart"]
+    }
+  },
+  "provides": {
+    "guidance": ["naming-conventions", "file-organization", "import-patterns", "type-patterns"],
+    "patterns": ["language-rules", "type-patterns", "anti-patterns"]
+  }
+}

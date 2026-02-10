@@ -1,0 +1,133 @@
+{
+  "$schema": "./skill-registry-schema.json",
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "conductor-methodology",
+      "version": "1.0.0",
+      "path": "./conductor-methodology",
+      "description": "Core Conductor development methodology and context-driven principles",
+      "summary_available": true,
+      "activation": {
+        "always_active": true
+      },
+      "provides": {
+        "guidance": ["conductor-concepts", "context-driven-development", "track-lifecycle"]
+      }
+    },
+    {
+      "name": "typescript-best-practices",
+      "version": "1.0.0",
+      "path": "./typescript-best-practices",
+      "description": "Type safety, async patterns, and null handling guidance for TypeScript development",
+      "activation": {
+        "keywords": ["typescript", "type", "interface", "generic", "async", "await", "promise", "nullable"],
+        "file_patterns": ["**/*.ts", "**/*.tsx", "**/tsconfig.json"],
+        "tech_stack": {
+          "languages": ["TypeScript"]
+        }
+      },
+      "provides": {
+        "guidance": ["type-safety", "async-patterns", "null-handling", "generics"],
+        "patterns": ["type-safety", "async-patterns", "null-handling"]
+      }
+    },
+    {
+      "name": "api-design",
+      "version": "1.0.0",
+      "path": "./api-design",
+      "description": "REST conventions, error responses, and versioning strategies for API development",
+      "activation": {
+        "keywords": ["api", "endpoint", "rest", "route", "controller", "http", "request", "response"],
+        "file_patterns": ["**/routes/**", "**/controllers/**", "**/api/**", "**/endpoints/**"],
+        "tech_stack": {
+          "frameworks": ["Express", "Fastify", "Koa", "Hono", "NestJS", "FastAPI", "Flask", "Django", "Gin", "Echo"]
+        }
+      },
+      "provides": {
+        "guidance": ["rest-conventions", "error-responses", "versioning", "pagination", "authentication"],
+        "patterns": ["rest-conventions", "error-responses", "versioning"]
+      }
+    },
+    {
+      "name": "testing-strategies",
+      "version": "1.0.0",
+      "path": "./testing-strategies",
+      "description": "Unit testing, integration testing, and mocking strategies for comprehensive test coverage",
+      "activation": {
+        "keywords": ["test", "testing", "unit", "integration", "mock", "assert", "expect", "spec", "coverage"],
+        "file_patterns": ["**/test/**", "**/tests/**", "**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+        "tech_stack": {
+          "tools": ["Jest", "Vitest", "Mocha", "Pytest", "Go test", "JUnit", "xUnit"]
+        }
+      },
+      "provides": {
+        "guidance": ["unit-testing", "integration-testing", "mocking", "test-structure", "assertions"],
+        "patterns": ["unit-test-patterns", "integration-patterns", "mocking-strategies"]
+      }
+    },
+    {
+      "name": "java-best-practices",
+      "version": "1.0.0",
+      "path": "./java-best-practices",
+      "description": "Type safety, concurrency patterns, and modern Java features guidance for Java 17+ development",
+      "activation": {
+        "keywords": ["java", "optional", "completablefuture", "record", "sealed", "virtual thread", "spring", "jakarta"],
+        "file_patterns": ["**/*.java", "**/pom.xml", "**/build.gradle", "**/build.gradle.kts"],
+        "tech_stack": {
+          "languages": ["Java"]
+        }
+      },
+      "provides": {
+        "guidance": ["type-safety", "concurrency", "modern-features", "null-handling"],
+        "patterns": ["type-safety", "concurrency", "modern-features"]
+      }
+    },
+    {
+      "name": "context-awareness",
+      "version": "1.0.0",
+      "path": "./context-awareness",
+      "description": "Auto-load Conductor project context including product, tech stack, workflow, and track information",
+      "activation": {
+        "always_active": true
+      },
+      "provides": {
+        "guidance": ["project-context", "track-status", "file-resolution"]
+      }
+    },
+    {
+      "name": "tdd-workflow",
+      "version": "1.0.0",
+      "path": "./tdd-workflow",
+      "description": "Test-driven development workflow with RED-GREEN-REFACTOR cycle guidance",
+      "activation": {
+        "keywords": ["test", "tdd", "red", "green", "refactor", "coverage", "unit", "integration"],
+        "file_patterns": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+        "tech_stack": {
+          "tools": ["Jest", "Vitest", "Mocha", "Pytest", "Go test", "JUnit"]
+        }
+      },
+      "provides": {
+        "guidance": ["tdd-cycle", "test-structure", "coverage-targets", "test-patterns"],
+        "patterns": ["red-green-refactor", "arrange-act-assert", "given-when-then"]
+      }
+    },
+    {
+      "name": "code-styleguides",
+      "version": "1.0.0",
+      "path": "./code-styleguides",
+      "description": "Language-specific coding standards for TypeScript, Python, Go, Java, C#, C++, Dart, and more",
+      "activation": {
+        "keywords": ["style", "convention", "naming", "format", "lint", "standard"],
+        "file_patterns": ["**/*.ts", "**/*.py", "**/*.go", "**/*.java", "**/*.cs", "**/*.cpp", "**/*.dart"],
+        "tech_stack": {
+          "languages": ["TypeScript", "Python", "Go", "Java", "JavaScript", "C#", "C++", "Dart"]
+        }
+      },
+      "provides": {
+        "guidance": ["naming-conventions", "file-organization", "import-patterns", "type-patterns"],
+        "patterns": ["language-rules", "type-patterns", "anti-patterns"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "context-awareness",
+  "version": "1.0.0",
+  "description": "Auto-load Conductor project context including product, tech stack, workflow, and track information",
+  "activation": {
+    "always_active": true
+  },
+  "provides": {
+    "guidance": ["project-context", "track-status", "file-resolution"]
+  }
+}

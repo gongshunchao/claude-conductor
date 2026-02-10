@@ -1,0 +1,16 @@
+{
+  "name": "tdd-workflow",
+  "version": "1.0.0",
+  "description": "Test-driven development workflow with RED-GREEN-REFACTOR cycle guidance",
+  "activation": {
+    "keywords": ["test", "tdd", "red", "green", "refactor", "coverage", "unit", "integration"],
+    "file_patterns": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+    "tech_stack": {
+      "tools": ["Jest", "Vitest", "Mocha", "Pytest", "Go test", "JUnit"]
+    }
+  },
+  "provides": {
+    "guidance": ["tdd-cycle", "test-structure", "coverage-targets", "test-patterns"],
+    "patterns": ["red-green-refactor", "arrange-act-assert", "given-when-then"]
+  }
+}
