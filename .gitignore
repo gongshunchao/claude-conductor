@@ -1,2 +1,24 @@
 # Git worktrees for parallel agent execution
 .worktrees/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (if used in hooks)
+node_modules/
+npm-debug.log*
+
+# Conductor runtime (generated per-project, not part of plugin)
+conductor/
+
+# Debug logs
+*.log

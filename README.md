@@ -1,18 +1,45 @@
 # Claude Conductor
 
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
+
 Context-Driven Development framework for Claude Code.
 
 > Inspired by [Conductor for Gemini CLI](https://github.com/gemini-cli-extensions/conductor)
 
 ## Overview
 
-Conductor enables **Context-Driven Development** - a methodology where context is treated as a managed artifact alongside code. It provides:
+Conductor enables **Context-Driven Development** — a methodology where context is treated as a managed artifact alongside code. It provides:
 
 - **Pre-implementation Planning**: Generate specs and plans before coding
 - **Test-Driven Development**: Enforced Red-Green-Refactor cycles
 - **Context Management**: Maintain style guides, tech stack, product goals
+- **Code Review**: Severity-rated review against guidelines, styleguides, and specs
 - **Iterative Safety**: Review plans before execution with checkpoints
 - **Intelligent Reversion**: Git-aware rollback of logical work units
+- **Session Resumption**: Automatically resume work across sessions
+
+## Quick Start
+
+```bash
+# 1. Start Claude Code with the plugin
+claude --plugin-dir /path/to/conductor
+
+# 2. Initialize your project
+/conductor:setup
+
+# 3. Create your first feature track
+/conductor:new-track Add user authentication
+
+# 4. Implement with TDD
+/conductor:implement
+
+# 5. Review completed work
+/conductor:review
+```
+
+**Full lifecycle**: Setup → Plan → Implement → Review → Archive
 
 ## Installation
 
@@ -41,7 +68,7 @@ Add the GitHub repository as a marketplace and install:
 
 ```bash
 # Add this repository as a marketplace
-/plugin marketplace add lackeyjb/claude-conductor
+/plugin marketplace add gongshunchao/claude-conductor
 
 # Install the plugin
 /plugin install conductor@claude-conductor
@@ -181,6 +208,51 @@ Task complete. Commit: feat(auth): Implement JWT validation [a1b2c3d]
 
 ---
 
+### `/conductor:review`
+
+Review completed work against guidelines, styleguides, and the plan.
+
+**Usage:**
+```
+/conductor:review [<track-name>]
+```
+
+**Arguments:**
+- `<track-name>` - Name of track to review (optional, will prompt if not provided)
+
+**What it does:**
+1. Loads product guidelines, code styleguides, and track context
+2. Extracts all commits associated with the track
+3. Reviews code against styleguides (High severity), spec compliance, and security
+4. Generates a severity-rated findings report
+5. Offers to auto-apply fixes or pause for manual resolution
+6. Provides track cleanup options (archive/delete/skip)
+
+**Example:**
+```
+> /conductor:review user-auth
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CONDUCTOR REVIEW REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Track: User Authentication
+  Files Reviewed: 12
+  Commits Analyzed: 8
+
+🟠 HIGH (2)
+  1. [Styleguide] Missing error handling in auth middleware
+  2. [Spec] Rate limiting not implemented per spec
+
+🟡 MEDIUM (1)
+  1. [Guidelines] Login button text doesn't match brand voice
+
+What would you like to do?
+A) Apply Fixes  B) Manual Fix  C) Accept & Continue
+```
+
+---
+
 ### `/conductor:status`
 
 Display project progress report.
@@ -296,51 +368,6 @@ Commits to revert (newest first):
 Do you want to proceed? [Y/n]
 ```
 
----
-
-### `/conductor:review`
-
-Review completed work against guidelines, styleguides, and the plan.
-
-**Usage:**
-```
-/conductor:review [<track-name>]
-```
-
-**Arguments:**
-- `<track-name>` - Name of track to review (optional, will prompt if not provided)
-
-**What it does:**
-1. Loads product guidelines, code styleguides, and track context
-2. Extracts all commits associated with the track
-3. Reviews code against styleguides (High severity), spec compliance, and security
-4. Generates a severity-rated findings report
-5. Offers to auto-apply fixes or pause for manual resolution
-6. Provides track cleanup options (archive/delete/skip)
-
-**Example:**
-```
-> /conductor:review user-auth
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  CONDUCTOR REVIEW REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Track: User Authentication
-  Files Reviewed: 12
-  Commits Analyzed: 8
-
-🟠 HIGH (2)
-  1. [Styleguide] Missing error handling in auth middleware
-  2. [Spec] Rate limiting not implemented per spec
-
-🟡 MEDIUM (1)
-  1. [Guidelines] Login button text doesn't match brand voice
-
-What would you like to do?
-A) Apply Fixes  B) Manual Fix  C) Accept & Continue
-```
-
 ## Configuration
 
 ### Workflow Customization
@@ -379,6 +406,16 @@ Language-specific style guides are provided in `templates/code-styleguides/`:
 - General (universal standards)
 
 During `/conductor:setup`, selected styleguides are copied to `conductor/code_styleguides/` based on your tech stack. The `code-styleguides` skill auto-activates when writing code, reading from your project's styleguide files.
+
+## Session Resumption
+
+Conductor automatically resumes work when starting a new session:
+
+1. **SessionStart hook** detects conductor project and shows current status
+2. **plan.md status markers** track progress (`[ ]` pending, `[~]` in-progress, `[x]` complete)
+3. **Run `/conductor:implement`** to continue from where you left off
+
+No special handoff files needed — plan.md is the single source of truth.
 
 ## Background Execution & Parallel Agents
 
@@ -435,9 +472,76 @@ Implementer completed. Merging worktree...
 ✓ Removed worktree
 ```
 
+## Project Structure
+
+### Plugin Structure
+
+```
+claude-conductor/
+├── .claude-plugin/
+│   ├── plugin.json           # Plugin manifest (name, version, entry points)
+│   └── marketplace.json      # Plugin marketplace metadata
+├── agents/
+│   ├── planner.md            # Planning agent (spec & plan generation)
+│   ├── implementer.md        # Implementation agent (TDD execution)
+│   └── reviewer.md           # Review agent (checkpoints & code review)
+├── commands/
+│   ├── setup.md              # /conductor:setup
+│   ├── new-track.md          # /conductor:new-track
+│   ├── implement.md          # /conductor:implement
+│   ├── review.md             # /conductor:review
+│   ├── status.md             # /conductor:status
+│   ├── agents.md             # /conductor:agents
+│   └── revert.md             # /conductor:revert
+├── skills/
+│   ├── context-awareness/    # Auto-load project context
+│   ├── tdd-workflow/         # TDD Red-Green-Refactor guidance
+│   └── code-styleguides/     # Language-specific style rules
+├── hooks/
+│   ├── hooks.json            # Hook event configuration
+│   └── scripts/              # Hook scripts (context loading, tracking)
+├── templates/
+│   └── code-styleguides/     # Styleguide templates (TS, Python, Go, JS, CSS, C#, General)
+├── reference/                # Detailed architecture documentation
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
+```
+
+### Project Structure (after `/conductor:setup`)
+
+```
+your-project/
+└── conductor/
+    ├── product.md           # Product vision and goals
+    ├── product-guidelines.md # Brand and design standards
+    ├── tech-stack.md        # Technology choices
+    ├── workflow.md          # Development methodology
+    ├── code_styleguides/    # Copied styleguides for your tech stack
+    ├── setup_state.json     # Resume capability state
+    ├── tracks.md            # Track overview
+    └── tracks/
+        └── <track_id>/
+            ├── spec.md      # Requirements specification
+            ├── plan.md      # Implementation plan
+            └── metadata.json
+```
+
+## Architecture
+
+Conductor uses Claude Code's plugin system:
+
+| Component | Purpose | Details |
+|-----------|---------|---------|
+| **Commands** (`/conductor:*`) | User-invoked actions | 7 commands: setup, new-track, implement, review, status, agents, revert |
+| **Agents** | Specialized subagents | planner, implementer, reviewer — each with preloaded skills |
+| **Skills** | Auto-loaded capabilities | context-awareness, tdd-workflow, code-styleguides |
+| **Hooks** | Event-driven automation | SessionStart (context loading), PostToolUse (change tracking) |
+| **Worktrees** | Git isolation | Parallel agent execution without conflicts |
+
 ### Skills Auto-Loading
 
-Agents now preload skills at startup for faster context loading:
+Agents preload skills at startup for faster context loading:
 
 | Agent | Preloaded Skills |
 |-------|-----------------|
@@ -450,27 +554,15 @@ This ensures agents have immediate access to:
 - TDD methodology (Red-Green-Refactor cycle)
 - Language-specific style guidelines
 
-## Project Structure
-
-When initialized, Conductor creates:
-
-```
-your-project/
-└── conductor/
-    ├── product.md           # Product vision and goals
-    ├── product-guidelines.md # Brand and design standards
-    ├── tech-stack.md        # Technology choices
-    ├── workflow.md          # Development methodology
-    ├── setup_state.json     # Resume capability state
-    ├── tracks.md            # Track overview
-    └── tracks/
-        └── <track_id>/
-            ├── spec.md      # Requirements specification
-            ├── plan.md      # Implementation plan
-            └── metadata.json
-```
-
 ## Troubleshooting
+
+### Prerequisites
+
+Before using Conductor:
+
+1. **Git repository**: Project must be a git repo (or `/conductor:setup` will init one)
+2. **Claude Code**: Version with plugin support
+3. **Test framework**: Project should have testing set up for TDD workflow
 
 ### Common Errors
 
@@ -489,13 +581,15 @@ Run /conductor:new-track to create your first track.
 Commit or stash your changes before running /conductor:revert.
 ```
 
-### Prerequisites
+### Resuming Interrupted Setup
 
-Before using Conductor:
+If setup is interrupted, it can be resumed:
 
-1. **Git repository**: Project must be a git repo (or `/conductor:setup` will init one)
-2. **Claude Code**: Version with plugin support
-3. **Test framework**: Project should have testing set up for TDD workflow
+```bash
+# Setup saves state in conductor/setup_state.json
+# Re-running setup will offer to resume from last successful step
+/conductor:setup
+```
 
 ### Debug Mode
 
@@ -510,38 +604,6 @@ Check hook execution logs:
 ~/.claude/debug/
 ```
 
-### Resuming Interrupted Setup
-
-If setup is interrupted, it can be resumed:
-
-```bash
-# Setup saves state in conductor/setup_state.json
-# Re-running setup will offer to resume from last successful step
-/conductor:setup
-```
-
-### Session Resumption
-
-Conductor automatically resumes work when starting a new session:
-
-1. **SessionStart hook** detects conductor project and shows current status
-2. **plan.md status markers** track progress (`[ ]` pending, `[~]` in-progress, `[x]` complete)
-3. **Run `/conductor:implement`** to continue from where you left off
-
-No special handoff files needed - plan.md is the single source of truth.
-
-## Architecture
-
-Conductor uses Claude Code's plugin system:
-
-| Component | Purpose |
-|-----------|---------|
-| **Commands** (`/conductor:*`) | User-invoked actions |
-| **Agents** | Specialized subagents with preloaded skills (planner, implementer, reviewer) |
-| **Skills** | Auto-loaded capabilities via frontmatter (TDD, styleguides, context) |
-| **Hooks** | Event-driven automation (context loading, change tracking) |
-| **Worktrees** | Git isolation for parallel agent execution |
-
 ## Documentation
 
 See the `reference/` directory for detailed documentation:
@@ -551,6 +613,24 @@ See the `reference/` directory for detailed documentation:
 - [Claude Code Mapping](reference/claude-code-mapping.md)
 - [Conductor Analysis](reference/conductor-analysis.md)
 
+## Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. **Fork** the repository
+2. **Create a branch**: `git checkout -b feat/my-feature`
+3. **Make changes** following the [General Styleguide](templates/code-styleguides/general.md)
+4. **Test** with Claude Code: `claude --plugin-dir /path/to/your-fork`
+5. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/): `feat: add new feature`
+6. **Open a Pull Request** with a clear description
+
+### Development Tips
+
+- Commands are Markdown files in `commands/` — edit and reload to test
+- Skills use frontmatter for activation rules — see `skills/*/SKILL.md`
+- Hooks are configured in `hooks/hooks.json` with scripts in `hooks/scripts/`
+- Test changes by running `claude --plugin-dir .` from the project root
+
 ## License
 
-Apache-2.0
+[Apache-2.0](LICENSE)
