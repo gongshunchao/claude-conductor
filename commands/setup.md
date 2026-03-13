@@ -345,7 +345,9 @@ Present the following overview to the user:
 
 1. **Commit:**
    ```bash
-   git add conductor/ && git commit -m "conductor(setup): Initialize environment"
+   # Respect .gitignore — skip ignored files
+   git add conductor/ 2>/dev/null
+   git diff --cached --quiet || git commit -m "conductor(setup): Initialize environment"
    ```
 
 2. **Announce:**

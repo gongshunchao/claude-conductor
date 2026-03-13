@@ -276,8 +276,8 @@ When all phases complete:
 Update `tracks.md`: `[~]` → `[x]`
 
 ```bash
-git add conductor/tracks.md
-git commit -m "conductor(track): Complete track '<description>'"
+git check-ignore -q conductor/tracks.md 2>/dev/null || git add conductor/tracks.md
+git diff --cached --quiet || git commit -m "conductor(track): Complete track '<description>'"
 ```
 
 ### 2. Synchronize Project Documentation
@@ -302,8 +302,11 @@ Check if project context files need updates based on the completed work:
 2. Await approval before editing
 3. Commit all doc changes together:
    ```bash
-   git add conductor/product.md conductor/tech-stack.md conductor/product-guidelines.md
-   git commit -m "docs(conductor): Synchronize docs for track '<description>'"
+   # Skip files ignored by .gitignore
+   for f in conductor/product.md conductor/tech-stack.md conductor/product-guidelines.md; do
+     git check-ignore -q "$f" 2>/dev/null || git add "$f"
+   done
+   git diff --cached --quiet || git commit -m "docs(conductor): Synchronize docs for track '<description>'"
    ```
 
 **If no updates needed:**
@@ -338,8 +341,10 @@ D) Skip: Leave track as-is in the tracks file
 3. Update `conductor/tracks.md`: Remove the completed track section
 4. Commit:
    ```bash
-   git add conductor/
-   git commit -m "conductor(track): Archive completed track '<description>'"
+   for f in conductor/tracks.md conductor/archive/<track_id>/; do
+     git check-ignore -q "$f" 2>/dev/null || git add "$f"
+   done
+   git diff --cached --quiet || git commit -m "conductor(track): Archive completed track '<description>'"
    ```
 
 **If "C" (Delete):**
@@ -350,8 +355,8 @@ D) Skip: Leave track as-is in the tracks file
 2. Update `conductor/tracks.md`: Remove the completed track section
 3. Commit:
    ```bash
-   git add conductor/
-   git commit -m "conductor(track): Delete completed track '<description>'"
+   git check-ignore -q conductor/tracks.md 2>/dev/null || git add conductor/tracks.md
+   git diff --cached --quiet || git commit -m "conductor(track): Delete completed track '<description>'"
    ```
 
 **If "D" (Skip):**

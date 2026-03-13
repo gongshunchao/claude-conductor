@@ -168,9 +168,9 @@ If a conflict occurs:
    A) Show conflict for manual resolution
    B) Abort entire revert
    ```
-   - **If A:** Display conflict, wait for user to resolve, then:
+   - **If A:** Display conflict, wait for user to resolve, then stage only the conflicted files:
      ```bash
-     git add . && git revert --continue
+     git diff --name-only --diff-filter=U | xargs git add && git revert --continue
      ```
    - **If B:** Abort and restore:
      ```bash
@@ -187,8 +187,8 @@ After all reverts complete:
    - Remove commit SHAs from reverted items
    - Commit correction:
      ```bash
-     git add conductor/tracks/
-     git commit -m "conductor(plan): Reset status after revert"
+     git check-ignore -q conductor/tracks/<track_id>/plan.md 2>/dev/null || git add conductor/tracks/<track_id>/plan.md
+     git diff --cached --quiet || git commit -m "conductor(plan): Reset status after revert"
      ```
 
 ---

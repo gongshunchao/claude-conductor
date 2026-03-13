@@ -163,8 +163,11 @@ If any of the first 3 files are missing:
 
 7. **Commit:**
    ```bash
-   git add conductor/tracks.md conductor/tracks/<track_id>/
-   git commit -m "chore(conductor): Add new track '<track_description>'"
+   # Skip files ignored by .gitignore
+   for f in conductor/tracks.md conductor/tracks/<track_id>/; do
+     git check-ignore -q "$f" 2>/dev/null || git add "$f"
+   done
+   git diff --cached --quiet || git commit -m "chore(conductor): Add new track '<track_description>'"
    ```
 
 8. **Announce:**

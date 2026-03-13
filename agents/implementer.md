@@ -84,9 +84,17 @@ If implementation differs from tech stack:
 4. Resume implementation
 
 ### Step 8: Commit Code Changes
+
+**Git Safety Rules:**
+- Only stage files YOU modified in this task — never use `git add .` or `git add -A`
+- Never use `git add -f` — always respect `.gitignore`
+- Before staging, check ignored status: `git check-ignore -q <file>` — skip if ignored
+- Before committing, review staged content: `git diff --cached --stat`
+- Only commit if there are staged changes: `git diff --cached --quiet || git commit ...`
+
 ```bash
-git add <files>
-git commit -m "<type>(<scope>): <description>"
+git add <files modified in this task>
+git diff --cached --quiet || git commit -m "<type>(<scope>): <description>"
 ```
 Types: feat, fix, refactor, test, docs, style, chore, perf
 
@@ -112,8 +120,8 @@ Change `[~]` to `[x]`, append first 7 chars of commit SHA:
 
 ### Step 11: Commit Plan Update
 ```bash
-git add conductor/tracks/<track_id>/plan.md
-git commit -m "conductor(plan): Complete '<task description>'"
+git check-ignore -q conductor/tracks/<track_id>/plan.md 2>/dev/null || git add conductor/tracks/<track_id>/plan.md
+git diff --cached --quiet || git commit -m "conductor(plan): Complete '<task description>'"
 ```
 
 ---

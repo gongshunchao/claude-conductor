@@ -326,8 +326,10 @@ C) Skip: Leave track as-is in the tracks file
 3. Update `conductor/tracks.md`: Remove the track section
 4. Commit:
    ```bash
-   git add conductor/
-   git commit -m "conductor(track): Archive completed track '<description>'"
+   for f in conductor/tracks.md conductor/archive/<track_id>/; do
+     git check-ignore -q "$f" 2>/dev/null || git add "$f"
+   done
+   git diff --cached --quiet || git commit -m "conductor(track): Archive completed track '<description>'"
    ```
 
 **If "B" (Delete):**
@@ -338,8 +340,8 @@ C) Skip: Leave track as-is in the tracks file
 2. Update `conductor/tracks.md`: Remove the track section
 3. Commit:
    ```bash
-   git add conductor/
-   git commit -m "conductor(track): Delete completed track '<description>'"
+   git check-ignore -q conductor/tracks.md 2>/dev/null || git add conductor/tracks.md
+   git diff --cached --quiet || git commit -m "conductor(track): Delete completed track '<description>'"
    ```
 
 **If "C" (Skip):**

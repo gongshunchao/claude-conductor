@@ -185,9 +185,16 @@ Ask: "**Does this meet your expectations? Please confirm with yes or provide fee
 
 ### 5.6 Create Checkpoint Commit
 
+**Git Safety Rules:**
+- Only stage files modified during this phase — never use `git add .` or `git add -A`
+- Never use `git add -f` — always respect `.gitignore`
+- Before staging, check ignored status: `git check-ignore -q <file>` — skip if ignored
+- Before committing, review staged content: `git diff --cached --stat`
+
 ```bash
-git add .
-git commit -m "conductor(checkpoint): Complete phase '<phase name>'"
+# Stage only files changed in this phase, skip .gitignore'd files
+git add <files changed in this phase>
+git diff --cached --quiet || git commit -m "conductor(checkpoint): Complete phase '<phase name>'"
 
 # Attach verification report as git note
 SHA=$(git log -1 --format="%H")
@@ -210,8 +217,8 @@ Append checkpoint SHA to phase heading:
 
 Commit update:
 ```bash
-git add conductor/tracks/<track_id>/plan.md
-git commit -m "conductor(plan): Mark phase '<name>' complete [<sha>]"
+git check-ignore -q conductor/tracks/<track_id>/plan.md 2>/dev/null || git add conductor/tracks/<track_id>/plan.md
+git diff --cached --quiet || git commit -m "conductor(plan): Mark phase '<name>' complete [<sha>]"
 ```
 
 ### 5.8 Announce Completion
