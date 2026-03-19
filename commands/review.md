@@ -283,11 +283,32 @@ C) Accept & Continue: Accept findings as-is and proceed to track cleanup
 ```
 
 **If "A" (Apply Fixes):**
-1. Apply code modifications for each fixable finding
-2. Run tests to verify fixes don't break anything
-3. Commit fixes: `fix: address review findings for '<track description>'`
-4. Re-run quick verification to confirm resolution
-5. Proceed to Track Cleanup
+
+**Phase 1 — Apply Code Fixes:**
+1. For each fixable High/Critical finding, apply the suggested code modification.
+   - Skip findings that require manual intervention (note them separately).
+   - Skip any changes to `plan.md` or other `conductor/` markdown files in this phase.
+2. Run tests to verify fixes don't break anything.
+   - If tests fail after a specific fix: revert that fix, mark it as requiring manual intervention.
+3. Commit code fixes (excluding conductor/ files):
+   ```bash
+   git add -A -- ':!conductor/'
+   git diff --cached --quiet || git commit -m "fix: address review findings for '<track description>'"
+   ```
+
+**Phase 2 — Update Plan:**
+4. Update `conductor/tracks/<track_id>/plan.md`:
+   - Append a `## Review Fixes` section listing:
+     - Auto-applied fixes (with commit SHA from step 3)
+     - Skipped findings requiring manual intervention
+5. Commit plan update:
+   ```bash
+   git check-ignore -q conductor/tracks/<track_id>/plan.md 2>/dev/null || git add conductor/tracks/<track_id>/plan.md
+   git diff --cached --quiet || git commit -m "conductor(review): Record review fixes for '<track description>'"
+   ```
+
+6. **Summary:** Announce how many findings were auto-fixed and how many require manual intervention (list them).
+7. Proceed to Track Cleanup
 
 **If "B" (Manual Fix):**
 - Announce: "Review paused. Fix the issues and run `/conductor:review` again when ready."
@@ -333,12 +354,22 @@ C) Skip: Leave track as-is in the tracks file
    ```
 
 **If "B" (Delete):**
-1. Remove track folder:
+1. **Confirm Deletion:** Use AskUserQuestion:
+   ```
+   ⚠️ WARNING: This will permanently delete conductor/tracks/<track_id>/ and all its contents. This action cannot be undone.
+
+   Are you sure?
+
+   A) Yes, permanently delete this track
+   B) No, cancel and go back
+   ```
+   - If "B" (cancel): Announce "Deletion cancelled. Track left as-is." **STOP.**
+2. Remove track folder:
    ```bash
    rm -rf conductor/tracks/<track_id>
    ```
-2. Update `conductor/tracks.md`: Remove the track section
-3. Commit:
+3. Update `conductor/tracks.md`: Remove the track section
+4. Commit:
    ```bash
    git check-ignore -q conductor/tracks.md 2>/dev/null || git add conductor/tracks.md
    git diff --cached --quiet || git commit -m "conductor(track): Delete completed track '<description>'"

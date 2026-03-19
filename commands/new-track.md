@@ -112,14 +112,55 @@ If any of the first 3 files are missing:
    > B) **Suggest Changes** — Tell me what to modify
    - Loop until approved.
 
+### 2.3.1 Skill Recommendations
+
+**PROTOCOL: Surface relevant skills for this track based on the confirmed spec.**
+
+1. **Load Skill Registry:** Read `${CLAUDE_PLUGIN_ROOT}/skills/skill-registry.json`.
+   - If missing or malformed: Skip this section silently. Proceed to Section 2.4.
+
+2. **Check Project Settings:** Read `conductor/settings.json` if it exists. Note any skills in `disabledSkills`.
+
+3. **Extract Keywords from Spec:** Tokenize the confirmed `spec.md` content. Normalize to lowercase, remove stop words.
+
+4. **Score Non-Always-Active Skills:** For each skill not marked `always_active: true` and not in `disabledSkills`:
+   - Match extracted keywords against `activation.keywords` (+1.0 per match)
+   - Match against `activation.file_patterns` if any files are implied by the spec (+1.5 per match)
+   - Match project tech stack (from `conductor/tech-stack.md`) against `activation.tech_stack` if present (+2.0 language, +1.5 framework, +1.0 tool)
+
+5. **Activation Threshold:** Collect skills scoring >= 1.5. Take top 3 by score.
+
+6. **If no skills score >= 1.5:** Proceed to Section 2.4 silently.
+
+7. **If skills qualify:** Announce:
+   ```
+   🔧 Recommended Skills for this track:
+
+   1. <skill-name> (score: <n>) — <skill description>
+   2. <skill-name> (score: <n>) — <skill description>
+
+   These skills will be automatically activated during implementation.
+   ```
+   Proceed to Section 2.4.
+
 ### 2.4 Create Track Artifacts and Update Registry
 
 1. **Check for Duplicate Track Name:**
    - List existing track directories in `conductor/tracks/`.
    - Extract short names from existing track IDs (e.g., `shortname_YYYYMMDD` → `shortname`).
-   - If the proposed short name matches an existing one:
-     > "A track with a similar name already exists: '<existing_track>'. Please choose a different name or resume the existing track."
-     HALT.
+   - If the proposed short name matches an existing one, use AskUserQuestion:
+     ```
+     A track with a similar name already exists: '<existing_track_id>'.
+
+     What would you like to do?
+
+     A) Resume existing track — switch to /conductor:implement <existing_track_id>
+     B) Create with a different name — I will provide a new name
+     C) Cancel — stop track creation
+     ```
+     - If "A" (Resume): Announce "To resume, run `/conductor:implement <existing_track_id>`." **HALT.**
+     - If "B" (Different name): Ask for a new short name. Re-run the duplicate check with the new name before continuing.
+     - If "C" (Cancel): Announce "Track creation cancelled." **HALT.**
 
 2. **Generate Track ID:** Create unique ID: `<shortname>_YYYYMMDD` (e.g., `user_auth_20260210`).
 

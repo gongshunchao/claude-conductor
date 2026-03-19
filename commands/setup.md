@@ -19,17 +19,42 @@ You are an AI agent. Your primary function is to set up and manage a software pr
 
 ## 1.1 Resume Check
 
-**PROTOCOL: Before starting the setup, determine the project's state using the state file.**
+**PROTOCOL: Before starting the setup, determine the project's state using the state file AND actual file existence.**
 
 1. **Read State File:** Check for the existence of `conductor/setup_state.json`.
    - If it does not exist, this is a new project setup. Proceed to **Section 1.2**.
-   - If it exists, read its content.
+   - If it exists, read its content. Let `STEP` = value of `last_successful_step`.
 
-2. **Resume Based on State:**
-   Let the value of `last_successful_step` be `STEP`. Based on `STEP`, jump to the **next logical section**:
+2. **Verify File Existence Against State:**
+   Run these checks in parallel to validate the state file is not stale:
+   ```bash
+   test -f conductor/product.md && echo "product:yes" || echo "product:no"
+   test -f conductor/product-guidelines.md && echo "guidelines:yes" || echo "guidelines:no"
+   test -f conductor/tech-stack.md && echo "techstack:yes" || echo "techstack:no"
+   test -d conductor/code_styleguides && echo "styleguides:yes" || echo "styleguides:no"
+   test -f conductor/workflow.md && echo "workflow:yes" || echo "workflow:no"
+   test -f conductor/index.md && echo "index:yes" || echo "index:no"
+   test -d conductor/tracks && echo "tracks:yes" || echo "tracks:no"
+   ```
 
-   | STEP Value | Resume Message | Jump To |
-   |------------|----------------|---------|
+3. **Detect Inconsistency:** Compare `STEP` against actual file presence:
+
+   | STEP Value | Required Files | If Files Missing |
+   |------------|----------------|------------------|
+   | `2.1_product_guide` | `product.md` | Reset to `""` (start fresh) |
+   | `2.2_product_guidelines` | `product.md`, `product-guidelines.md` | Reset to last consistent step |
+   | `2.3_tech_stack` | above + `tech-stack.md` | Reset to last consistent step |
+   | `2.4_code_styleguides` | above + `code_styleguides/` | Reset to last consistent step |
+   | `2.5_workflow` | above + `workflow.md` | Reset to last consistent step |
+   | `3.3_initial_track_generated` | above + `index.md`, `tracks/` | Reset to last consistent step |
+
+   **Reset logic:** If files for `STEP` are missing, find the highest step whose required files ARE all present. Use that as the effective `STEP`. Announce: "State file indicates step `<STEP>` but some files are missing. Resuming from `<effective_step>` instead."
+
+4. **Resume Based on Effective State:**
+
+   | Effective STEP | Resume Message | Jump To |
+   |----------------|----------------|---------|
+   | `""` (empty/reset) | "Starting fresh setup." | Section 1.2 |
    | `2.1_product_guide` | "Product Guide is complete. Next: Product Guidelines." | Section 2.2 |
    | `2.2_product_guidelines` | "Product Guide and Guidelines are complete. Next: Tech Stack." | Section 2.3 |
    | `2.3_tech_stack` | "Guides and Tech Stack defined. Next: Code Styleguides." | Section 2.4 |
@@ -96,7 +121,12 @@ Present the following overview to the user:
       git ls-files --exclude-standard -co 2>/dev/null | head -50 || find . -maxdepth 3 -type f -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/.idea/*' | head -50
       ```
    d. **Prioritize Key Files:** Focus on README.md, manifest files (package.json, go.mod, etc.), and configuration files first.
-   e. **Handle Large Files:** For files over 1MB, read only first and last 20 lines.
+   e. **Handle Large Files:** For files over 1MB, read only first and last 20 lines. Skip binary files entirely (images, compiled artifacts, archives):
+      ```bash
+      wc -c <file> | awk '{if ($1 > 1048576) print "large"}'
+      # If large: head -20 <file> && echo "..." && tail -20 <file>
+      # If binary (images, .o, .jar, .zip, etc.): skip entirely
+      ```
    f. **Extract and Infer:**
       - Programming languages and frameworks
       - Database drivers and services

@@ -348,12 +348,22 @@ D) Skip: Leave track as-is in the tracks file
    ```
 
 **If "C" (Delete):**
-1. Remove track folder:
+1. **Confirm Deletion:** Use AskUserQuestion:
+   ```
+   ⚠️ WARNING: This will permanently delete conductor/tracks/<track_id>/ and all its contents. This action cannot be undone.
+
+   Are you sure?
+
+   A) Yes, permanently delete this track
+   B) No, cancel and go back
+   ```
+   - If "B" (cancel): Announce "Deletion cancelled. Track left as-is." **STOP.**
+2. Remove track folder:
    ```bash
    rm -rf conductor/tracks/<track_id>
    ```
-2. Update `conductor/tracks.md`: Remove the completed track section
-3. Commit:
+3. Update `conductor/tracks.md`: Remove the completed track section
+4. Commit:
    ```bash
    git check-ignore -q conductor/tracks.md 2>/dev/null || git add conductor/tracks.md
    git diff --cached --quiet || git commit -m "conductor(track): Delete completed track '<description>'"
